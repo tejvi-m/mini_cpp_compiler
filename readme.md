@@ -2,8 +2,8 @@
 
 A compiler to work on a subset of C++
 
-#Todo
+##Todo
 
-- [] Lexer-Parser
-- [] Token Generation
-- [] Symbol Table Generation
+- [ ] Lexer-Parser
+- [ ] Token Generation
+- [ ] Symbol Table Generation
