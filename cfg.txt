@@ -1,0 +1,66 @@
+The Context Free Grammar for do-while, for and if-else in C++ :-
+
+
+S -> type main( args ) { body return expression; }
+
+args -> int argc | int argc, char **argv | int argc, char* argv[]
+
+type -> d dType | auto | lambda 
+
+d -> extern | thread_local | register | d | long | short | mutable | lambda
+
+dType -> int | char | string | bool | user_defined
+
+body -> expression body | { body } | selectionSt | iterationSt | body | lambda
+
+selectionSt -> if( condition ) body | if (condition) body elseBlock | lambda
+
+elseBlock -> else body | else if(condition) body elseBlock |lambda
+
+iterationSt -> while ( condition ) body | do {body} while( expression ); | for(init; condition; expression) body | lambda
+
+
+init-> dtype var = value | dtype var; | lambda 
+condition -> var relOp value | expression
+var -> id
+
+id -> _idN
+idN -> 0-9 idN | a-zidN | _idN | a-ZidN | lambda
+Assignment -> d dtype Assign | lambda
+Assign -> ,var = value Assign | lambda
+
+relOp -> <= | < | > | >= | == | ! =
+
+binOp -> + | - | * | / | % 
+
+unaryOp -> ++ | --;
+
+
+expression -> condition ; | init ; | dtype id = value; | assignment; | lambda
+
+value -> val relOp value | val binOp value | val unaryOp | unaryOp val | val;
+
+val -> literal | var 
+literal -> 0-9 n | " letter " | char | true | false
+
+n -> 0 - 9 n | lambda
+letter -> char letter | lambda 
+
+
+Keyword:(include for, while, if, else, do while, types, keywords etc)
+<KW,lex,Ino>
+
+Identifier:
+<ID,lex,scope,datatype,value,Ino>
+
+Arithmetic Operators:
+<AOP,lex,Ino>
+
+Relational Operators:
+<ROP,lex,Ino>
+
+Unary Operators:
+<UOP,lex,Ino>
+
+Separators:
+<SEP,lex,Ino>
