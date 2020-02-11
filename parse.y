@@ -20,8 +20,8 @@ extern void display();
 
 %%
 S:
-    PREP type MAIN OB args CB OBR body COL RET expression COL CBR
-    | PREP type MAIN OB args CB OBR body COL {printf("done!"); return 0;}
+    PREP type MAIN OB args CB OBR body CBR
+    | PREP type MAIN OB args CB OBR body CBR {printf("done!"); return 0;}
 ;
 args: "int argc" 
 	| "int argc, char **argv" 
@@ -43,24 +43,26 @@ dType: INT_TYPE
 		| B_TYPE
 ;
 body: expression body 
-		| OBR body CBR 
+		| OBR body CBR body
 		| selectionSt 
 		| iterationSt 
-		| body
-		| 
+		| RET expression
+		|
 ;
 selectionSt:IF OB condition CB body elseBlock 
+			|IF OB condition CB body
 			|
 ;
-elseBlock: ELSE selectionSt 
+elseBlock: ELSE body
 ;
 iterationSt: WHILE OB condition CB body 
-			| DO OBR body CBR WHILE OB expression CB COL 
-			| FOR OB init COL condition COL expression OB body 
+			| DO OBR body CBR WHILE OB expression CB COL body
+			| FOR OB init COL condition COL expressionfor CB body
+			| 
 ;
 
-init: dType var ASGN value 
-	| dType var; 
+init: dType var ASGN value
+	| dType var
 	|
 ;
 condition: var relOp value 
@@ -74,7 +76,7 @@ idN: NUM
 	| IDEN 
 	| 
 ;
-Assignment: d dType Assign 
+Assignment: d dType var ASGN value Assign 
 ;
 Assign: ',' var ASGN value Assign 
 		|
@@ -93,18 +95,27 @@ binOp: PLUS
 		| MOD
 ;
 unaryOp: INC 
-		| DEC;
+		| DEC
+;
+expressionfor: condition 
+			| init
+			| dType id ASGN value 
+			| Assignment
+			| value
+			| NUM
 ;
 expression: condition COL 
-			| init COL 
+			| init COL
 			| dType id ASGN value COL 
-			| Assignment COL 
+			| Assignment COL
+			| value COL
+			| NUM
 ;
 value: val relOp value 
 		| val binOp value 
 		| val unaryOp 
 		| unaryOp val 
-		| val COL
+		| val
 ;
 val: literal 
 	| var
