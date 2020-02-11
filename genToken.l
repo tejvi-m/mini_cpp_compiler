@@ -6,6 +6,7 @@
     	int st[100];
 	int top;
 	int count;
+	int flag = 0;
 	void insertIntoSym(char *text,int nm,int scp);
 	void display();
 	
@@ -23,13 +24,13 @@ digit [0-9]
 \/\/(.*) {};
 \/\*(.*\n)*.*\*\/  {};
 
-\n yylineno++;
+\n {yylineno++;}
 
 #include\ *<{alphabet}+(\.{alphabet}*)?> {printf("%d\t%s\tPREPROCESSOR\n", yylineno, yytext); return PREP;}
 
 return {printf("%d\t%s\tKEYW\n", yylineno, yytext); return RET;}
 main {printf("%d\t%s\tKEYW\n", yylineno, yytext); return MAIN;}
-for {printf("%d\t%s\tKEYW\n", yylineno, yytext); return FOR;}
+for {printf("%d\t%s\tKEYW\n", yylineno, yytext); flag = 1; count=count+1; top = top + 1; st[top]=count; return FOR;}
 while {printf("%d\t%s\tKEYW\n", yylineno, yytext); return WHILE;}
 
 if {printf("%d\t%s\tKEYW\n", yylineno, yytext); return IF;}
@@ -50,7 +51,10 @@ struct {printf("%d\t%s\tTYPE\n", yylineno, yytext); return S_TYPE;}
 \( {printf("%d\t%s\tOPEN BRACKETS\n", yylineno,yytext); return OB;}
 \) {printf("%d\t%s\tCLOSE BRACKETS\n", yylineno, yytext); return CB;}
 
-\{ {count=count+1;top=top+1;st[top]=count;printf("%d\t%s\tOPEN BRACES\n", yylineno, yytext); return OBR;}
+\{ {if(!flag){
+		count=count+1;top=top+1;st[top]=count;
+	}
+	printf("%d\t%s\tOPEN BRACES\n", yylineno, yytext); return OBR;}
 \} {top=top-1;printf("%d\t%s\tCLOSE BRACES\n", yylineno, yytext); return CBR;}
 
 {alphabet}({alphabet}|{digit})* {insertIntoSym(yytext,yylineno,st[top]);printf("%d\t%s\tIDENTIFIER\n", yylineno, yytext); return IDEN;}
