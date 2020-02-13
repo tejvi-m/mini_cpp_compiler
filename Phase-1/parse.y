@@ -22,6 +22,7 @@ extern void displaySymTable();
 S:
     PREP type MAIN OB args CB OBR body CBR
     | PREP type MAIN OB args CB OBR body CBR {printf("done!"); return 0;}
+	| error { yyerrok; yyclearin;}
 ;
 args: "int argc" 
 	| "int argc, char **argv" 
@@ -134,6 +135,7 @@ int yyerror(const char *s)
   	extern int yylineno;
   	valid =0;
   	printf("Line no: %d \n The error is: %s\n",yylineno,s);
+	
 }
 
 int main()
