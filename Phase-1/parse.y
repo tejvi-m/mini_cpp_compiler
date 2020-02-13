@@ -4,10 +4,10 @@
 int valid=1;
 int yylex();
 int yyerror(const char *s);
-extern int st[100];
-extern int top;
+extern int SymTable[100];
+extern int t_scope;
 extern int count;
-extern void display();
+extern void displaySymTable();
 	
 %}
 
@@ -138,8 +138,7 @@ int yyerror(const char *s)
 
 int main()
 {
-	st[0]=0;
-	top=0;
+	t_scope=1;
 	count=0;
 	yyparse();
 	if(valid)
@@ -148,6 +147,6 @@ int main()
 	{
   		printf("Parsing unsuccessful\n\n\n");
 	}
-	display();
+	displaySymTable();
 	return 0;
 } 

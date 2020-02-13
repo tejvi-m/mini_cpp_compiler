@@ -1,17 +1,23 @@
-%option yylineno
 %{
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <string.h>
+    #include "y.tab.h"
+    typedef struct node{
+        int scope;
+        char value[100];
+   
+    }node;
 
-    	#include "y.tab.h"
-	#include <stdio.h>
-    	int st[100];
-	int top;
-	int count;
-	int flag = 0;
-	void insertIntoSym(char *text,int nm,int scp);
-	void display();
-	
-
-	
+    typedef struct table{
+        node* head;
+    }table;
+    int count = 0;
+    node symTable[1000];
+    int t_scope = 1;
+    int flag = 0;
+    void insert(node* head, int* idx, int scope, char* val);
+    void displaySymTable();
 %}
 
 
@@ -19,7 +25,6 @@ alphabet [a-zA-z_]
 digit [0-9]
 
 %%
-
 
 \/\/(.*) {};
 \/\*(.*\n)*.*\*\/  {};
@@ -30,8 +35,8 @@ digit [0-9]
 
 return {printf("%d\t%s\tKEYW\n", yylineno, yytext); return RET;}
 main {printf("%d\t%s\tKEYW\n", yylineno, yytext); return MAIN;}
-for {printf("%d\t%s\tKEYW\n", yylineno, yytext); flag = 1; count=count+1; top = top + 1; st[top]=count; return FOR;}
-while {printf("%d\t%s\tKEYW\n", yylineno, yytext); return WHILE;}
+for {printf("%d\t%s\tKEYW\n", yylineno, yytext); flag = 1; t_scope++; return FOR;}
+while {printf("%d\t%s\tKEYW\n", yylineno, yytext); flag = 1; t_scope++; return WHILE;}
 
 if {printf("%d\t%s\tKEYW\n", yylineno, yytext); return IF;}
 else {printf("%d\t%s\tKEYW\n", yylineno, yytext); return ELSE;}
@@ -52,12 +57,12 @@ struct {printf("%d\t%s\tTYPE\n", yylineno, yytext); return S_TYPE;}
 \) {printf("%d\t%s\tCLOSE BRACKETS\n", yylineno, yytext); return CB;}
 
 \{ {if(!flag){
-		count=count+1;top=top+1;st[top]=count;
+		t_scope++;
 	}
 	printf("%d\t%s\tOPEN BRACES\n", yylineno, yytext); return OBR;}
-\} {top=top-1;printf("%d\t%s\tCLOSE BRACES\n", yylineno, yytext); return CBR;}
+\} {t_scope--;printf("%d\t%s\tCLOSE BRACES\n", yylineno, yytext); return CBR;}
 
-{alphabet}({alphabet}|{digit})* {insertIntoSym(yytext,yylineno,st[top]);printf("%d\t%s\tIDENTIFIER\n", yylineno, yytext); return IDEN;}
+{alphabet}({alphabet}|{digit})* {insert(symTable, &count, t_scope, yytext);printf("%d\t%s\tIDENTIFIER\n", yylineno, yytext); return IDEN;}
 
 {digit}+ {printf("%d\t%s\tINTEGER\n", yylineno, yytext); return NUM;}
 {digit}+\.{digit}+(E(\+|\-)?{digit}+)? {printf("%d\t%s\tFLOATING POINT NUMBER\n", yylineno, yytext); return FLT;}
@@ -91,53 +96,62 @@ struct {printf("%d\t%s\tTYPE\n", yylineno, yytext); return S_TYPE;}
 \"(\\.|[^"\\])*\" {printf("%d\t%s\tSTRING CONSTANT\n", yylineno, yytext); return STRC;}
 
 
-. {return yytext[0];}
+. {printf("%d\t%s\ERROR\n", yylineno, yytext);}
+
 %%
 
-struct scope
-{
-	char arr[20][20];
-	int up;
-};
+void insert(node* head, int* idx, int scope, char* val){
+    int present = 0;
+    for(int i = 0; i < *idx; i++){
+            if(!strcmp(head[i].value, val) && head[i].scope == scope){
+                present = 1;
+                break;
+            }
+    }
 
-struct scope symtab[100];
+    if(!present){
+        head[*idx].scope = scope;
+        strcpy(head[*idx].value, val);
+        *idx = *idx + 1;
+
+    }
 
 
-void insertIntoSym(char *text,int nm,int scp)
-{
-	int present=0;
-	for(int i=0;i<=symtab[scp].up;i++)
-	{
-		if(strcmp(symtab[scp].arr[i],text)==0)
-		{
-			present=1;
-			break;
-		}
-	}
-	if(present==0)
-	{
-		symtab[scp].up++;
-		int p=symtab[scp].up;
-		strcpy(symtab[scp].arr[p],text);
-	}
+    // node* newEntry = (node*) malloc(sizeof(node));
+    // newEntry->scope = scope;
+    // strcpy(newEntry->value, val);
+    // newEntry->next = NULL;
+    // if(!head){
+    //     head = newEntry;
+    // }
+    // else{
+    //     newEntry->next = head;
+    //     head = newEntry;
+    // }
 }
 
-void display()
+void displaySymTable()
 {
-	for(int i=0;i<=count;i++)
-	{
-		printf("Scope %d \n",i);
-		printf("----------\n");
-		int h=symtab[i].up;
-		for (int j=1;j<=h;j++)
-		{
-			printf("Symbol:%s \n",symtab[i].arr[j]);
-		}
-		printf("\n\n");
-	}	
+        for(int i = 0; i < count; i++)
+        {
+                printf("Scope %d\t",symTable[i].scope);
+                printf("Token is %s\n", symTable[i].value);
+        }       
 }
 
-int yywrap()
-{
-return 1;
+int yywrap(){
+    return 1;
 }
+
+// int main(int argc, char * argv[]){
+//     //table* symTable = (table*) malloc(sizeof(table));
+//     // symTable->head = NULL;
+
+//     yyin=fopen(argv[1],"r");
+//     printf("LINE\tLEXME\tTOKEN\n");
+//     yylex();
+
+//     displaySymTable();
+//     fclose(yyin);
+//     return 0;
+// }
