@@ -8,13 +8,13 @@ extern int SymTable[100];
 extern int t_scope;
 extern int count;
 extern void displaySymTable();
-	
+
 %}
 
 %define parse.error verbose
 %start S
 %token PREP RET MAIN FOR WHILE IF ELSE DO INT_TYPE FLT_TYPE C_TYPE S_TYPE B_TYPE L_MODIF SI_MODIF U_MODIF S_MODIF OB OBR CB CBR IDEN NUM FLT LT GE LE GT NE EQ PLUS MINUS MUL DIV MOD INC DEC AND OR NOT ASGN COL STRC
-%left LT GT LE GE EQ NE 
+%left LT GT LE GE EQ NE
 %right ASGN
 
 
@@ -22,55 +22,51 @@ extern void displaySymTable();
 S:
     PREP type MAIN OB args CB OBR body CBR
     | PREP type MAIN OB args CB OBR body CBR {printf("done!"); return 0;}
-<<<<<<< HEAD
-    | error
-=======
 	| error { yyerrok; yyclearin;}
->>>>>>> 9c27451bfc5edd300f3248283cfe76ecfb9a5814
 ;
-args: "int argc" 
-	| "int argc, char **argv" 
+args: "int argc"
+	| "int argc, char **argv"
 	| "int argc, char* argv[]"
     |
 ;
-type: d dType 
-	
+type: d dType
+
 ;
-d:  L_MODIF 
-	| S_MODIF 
+d:  L_MODIF
+	| S_MODIF
     | SI_MODIF
     | U_MODIF
-	|	
+	|
 ;
 dType: INT_TYPE
         |FLT_TYPE
-		| C_TYPE 
+		| C_TYPE
 		| B_TYPE
 ;
-body: expression body 
+body: expression body
 		| OBR body CBR body
-		| selectionSt 
-		| iterationSt 
+		| selectionSt
+		| iterationSt
 		| RET expression
 		|
 ;
-selectionSt:IF OB condition CB body elseBlock 
+selectionSt:IF OB condition CB body elseBlock
 			|IF OB condition CB body
 			|
 ;
 elseBlock: ELSE body
 ;
-iterationSt: WHILE OB condition CB body 
+iterationSt: WHILE OB condition CB body
 			| DO OBR body CBR WHILE OB expression CB COL body
 			| FOR OB init COL condition COL expressionfor CB body
-			| 
+			|
 ;
 
 init: dType var ASGN value
 	| dType var
 	|
 ;
-condition: var relOp value 
+condition: var relOp value
 			|expression
 ;
 var: id
@@ -78,54 +74,54 @@ var: id
 id: '_' idN | idN
 ;
 idN: NUM
-	| IDEN 
-	| 
+	| IDEN
+	|
 ;
-Assignment: d dType var ASGN value Assign 
+Assignment: d dType var ASGN value Assign
 ;
-Assign: ',' var ASGN value Assign 
+Assign: ',' var ASGN value Assign
 		|
 ;
-relOp: LE 
-		| LT 
+relOp: LE
+		| LT
 		| GT
 		| GE
-		| EQ 
+		| EQ
 		| NE
 ;
-binOp: PLUS 
-		| MINUS 
-		| MUL 
-		| DIV 
+binOp: PLUS
+		| MINUS
+		| MUL
+		| DIV
 		| MOD
 ;
-unaryOp: INC 
+unaryOp: INC
 		| DEC
 ;
-expressionfor: condition 
+expressionfor: condition
 			| init
-			| dType id ASGN value 
+			| dType id ASGN value
 			| Assignment
 			| value
 			| NUM
 ;
-expression: condition COL 
+expression: condition COL
 			| init COL
-			| dType id ASGN value COL 
+			| dType id ASGN value COL
 			| Assignment COL
 			| value COL
 			| NUM
 ;
-value: val relOp value 
-		| val binOp value 
-		| val unaryOp 
-		| unaryOp val 
+value: val relOp value
+		| val binOp value
+		| val unaryOp
+		| unaryOp val
 		| val
 ;
-val: literal 
+val: literal
 	| var
-; 
-literal: NUM 
+;
+literal: NUM
 		| FLT
 		| letter
 ;
@@ -139,7 +135,7 @@ int yyerror(const char *s)
   	extern int yylineno;
   	valid =0;
   	printf("Line no: %d \n The error is: %s\n",yylineno,s);
-	
+
 }
 
 int main()
@@ -155,4 +151,4 @@ int main()
 	}
 	displaySymTable();
 	return 0;
-} 
+}
