@@ -22,6 +22,7 @@ extern void displaySymTable();
 S:
     PREP type MAIN OB args CB OBR body CBR
     | PREP type MAIN OB args CB OBR body CBR {printf("done!"); return 0;}
+    | error
 ;
 args: "int argc" 
 	| "int argc, char **argv" 
