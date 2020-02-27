@@ -6,6 +6,7 @@
     typedef struct node{
         int scope;
         char value[100];
+        char dtype[50];
    
     }node;
 
@@ -16,7 +17,9 @@
     node symTable[1000];
     int t_scope = 1;
     int flag = 0;
-    void insert(node* head, int* idx, int scope, char* val);
+    int dflag = 0;
+    char tdType[50];
+    void insert(node* head, int* idx, int scope, char* dtype, char* val);
     void displaySymTable();
 %}
 
@@ -34,7 +37,7 @@ digit [0-9]
 #include\ *<{alphabet}+(\.{alphabet}*)?> {printf("%d\t%s\tPREPROCESSOR\n", yylineno, yytext); return PREP;}
 
 return {printf("%d\t%s\tKEYW\n", yylineno, yytext); return RET;}
-main {printf("%d\t%s\tKEYW\n", yylineno, yytext); return MAIN;}
+main {printf("%d\t%s\tKEYW\n", yylineno, yytext); dflag = 0; return MAIN;}
 for {printf("%d\t%s\tKEYW\n", yylineno, yytext); flag = 1; t_scope++; return FOR;}
 while {printf("%d\t%s\tKEYW\n", yylineno, yytext); flag = 1; t_scope++; return WHILE;}
 
@@ -42,11 +45,11 @@ if {printf("%d\t%s\tKEYW\n", yylineno, yytext); return IF;}
 else {printf("%d\t%s\tKEYW\n", yylineno, yytext); return ELSE;}
 do {printf("%d\t%s\tKEYW\n", yylineno, yytext); return DO;}
 
-int {printf("%d\t%s\tTYPE\n", yylineno, yytext); return INT_TYPE;}
-float {printf("%d\t%s\tTYPE\n", yylineno, yytext); return FLT_TYPE;}
-bool {printf("%d\t%s\tTYPE\n", yylineno, yytext); return B_TYPE;}
-char {printf("%d\t%s\tTYPE\n", yylineno, yytext); return C_TYPE;}
-struct {printf("%d\t%s\tTYPE\n", yylineno, yytext); return S_TYPE;}
+int {printf("%d\t%s\tTYPE\n", yylineno, yytext);  dflag = 1; strcpy(tdType, yytext); return INT_TYPE;}
+float {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yytext); return FLT_TYPE;}
+bool {printf("%d\t%s\tTYPE\n", yylineno, yytext);  dflag = 1; strcpy(tdType, yytext);return B_TYPE;}
+char {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yytext); return C_TYPE;}
+struct {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yytext); return S_TYPE;}
 
 "long" {printf("%d\t%s\tTYPE\n", yylineno, yytext); return L_MODIF;}
 "short" {printf("%d\t%s\tTYPE\n", yylineno, yytext); return S_MODIF;}
@@ -62,7 +65,11 @@ struct {printf("%d\t%s\tTYPE\n", yylineno, yytext); return S_TYPE;}
 	printf("%d\t%s\tOPEN BRACES\n", yylineno, yytext); return OBR;}
 \} {t_scope--;printf("%d\t%s\tCLOSE BRACES\n", yylineno, yytext); return CBR;}
 
-{alphabet}({alphabet}|{digit})* {insert(symTable, &count, t_scope, yytext);printf("%d\t%s\tIDENTIFIER\n", yylineno, yytext); return IDEN;}
+{alphabet}({alphabet}|{digit})* {
+                                if(dflag)
+                                    insert(symTable, &count, t_scope, tdType, yytext);printf("%d\t%s\tIDENTIFIER\n", yylineno, yytext);
+                                dflag = 0;    
+                                return IDEN;}
 
 {digit}+ {printf("%d\t%s\tINTEGER\n", yylineno, yytext); return NUM;}
 {digit}+\.{digit}+(E(\+|\-)?{digit}+)? {printf("%d\t%s\tFLOATING POINT NUMBER\n", yylineno, yytext); return FLT;}
@@ -98,9 +105,10 @@ struct {printf("%d\t%s\tTYPE\n", yylineno, yytext); return S_TYPE;}
 
 . {printf("%d\t%s\ERROR\n", yylineno, yytext);}
 
+
 %%
 
-void insert(node* head, int* idx, int scope, char* val){
+void insert(node* head, int* idx, int scope, char* dtype, char* val){
     int present = 0;
     for(int i = 0; i < *idx; i++){
             if(!strcmp(head[i].value, val) && head[i].scope == scope){
@@ -112,6 +120,7 @@ void insert(node* head, int* idx, int scope, char* val){
     if(!present){
         head[*idx].scope = scope;
         strcpy(head[*idx].value, val);
+        strcpy(head[*idx].dtype, dtype);
         *idx = *idx + 1;
 
     }
@@ -135,7 +144,8 @@ void displaySymTable()
         for(int i = 0; i < count; i++)
         {
                 printf("Scope %d\t",symTable[i].scope);
-                printf("Token is %s\n", symTable[i].value);
+                printf("Token is %s\t", symTable[i].value);
+                printf("data type is %s\n", symTable[i].dtype);
         }       
 }
 
