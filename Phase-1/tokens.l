@@ -41,6 +41,7 @@ char {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yyte
 for {printf("%d\t%s\tKEYW\n", yylineno, yytext); flag = 1; t_scope++; return FOR;}
 while {printf("%d\t%s\tKEYW\n", yylineno, yytext); flag = 1; t_scope++; return WHILE;}
 
+return {printf("%d\t%s\tKEYW\n", yylineno, yytext); return RETURN;} 
 if {printf("%d\t%s\tKEYW\n", yylineno, yytext); return IF;}
 else {printf("%d\t%s\tKEYW\n", yylineno, yytext); return ELSE;}
 
