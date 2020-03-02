@@ -37,18 +37,6 @@ digit [0-9]
 int {printf("%d\t%s\tTYPE\n", yylineno, yytext);  dflag = 1; strcpy(tdType, yytext); return INT;}
 float {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yytext); return FLOAT;}
 char {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yytext); return CHAR;}
-
-{alphabet}({alphabet}|{digit})* {
-                                if(dflag)
-                                    insert(symTable, &count, t_scope, tdType, yytext);printf("%d\t%s\tIDENTIFIER\n", yylineno, yytext);
-                                dflag = 0;
-                                return ID;}
-
-"#include"  {printf("%d\t%s\tKEYW\n", yylineno, yytext); dflag = 0; return INCLUDE;}
-
-{alphabet}({alphabet}|{digit})*"\.h"?  {printf("%d\t%s\tPREPROCESSOR\n", yylineno, yytext); return H;}
-
-
 "main()" {printf("%d\t%s\tKEYW\n", yylineno, yytext); dflag = 0; return MAINTOK;}
 for {printf("%d\t%s\tKEYW\n", yylineno, yytext); flag = 1; t_scope++; return FOR;}
 while {printf("%d\t%s\tKEYW\n", yylineno, yytext); flag = 1; t_scope++; return WHILE;}
@@ -61,6 +49,18 @@ cout {printf("%d\t%s\tKEYW\n", yylineno, yytext); return COUT;}
 endl {printf("%d\t%s\tKEYW\n", yylineno, yytext); return ENDL;}
 break {printf("%d\t%s\tKEYW\n", yylineno, yytext); return BREAK;}
 continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
+
+{alphabet}({alphabet}|{digit})* {
+                                if(dflag)
+                                    insert(symTable, &count, t_scope, tdType, yytext);printf("%d\t%s\tIDENTIFIER\n", yylineno, yytext);
+                                dflag = 0;
+                                return ID;}
+
+"#include"  {printf("%d\t%s\tKEYW\n", yylineno, yytext); dflag = 0; return INCLUDE;}
+
+{alphabet}({alphabet}|{digit})*"\.h"?  {printf("%d\t%s\tPREPROCESSOR\n", yylineno, yytext); return H;}
+
+
 
 
 
