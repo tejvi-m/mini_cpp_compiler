@@ -98,7 +98,7 @@ continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
 ! {printf("%d\t%s\tLOGICAL OPERATORS\n", yylineno, yytext); return T_neq;}
 
 = {printf("%d\t%s\tASSIGNMENT\n", yylineno, yytext); return T_eq;}
-";ROR" {printf("%d\t%s\tTERMINATOR\n", yylineno, yytext); return TERMINATOR;}
+";" {printf("%d\t%s\tTERMINATOR\n", yylineno, yytext); return TERMINATOR;}
 
 \t ;
 
