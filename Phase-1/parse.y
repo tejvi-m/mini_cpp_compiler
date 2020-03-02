@@ -11,122 +11,136 @@ extern void displaySymTable();
 
 %}
 
-%define parse.error verbose
-%start S
-%token PREP RET MAIN FOR WHILE IF ELSE DO INT_TYPE FLT_TYPE C_TYPE S_TYPE B_TYPE L_MODIF SI_MODIF U_MODIF S_MODIF OB OBR CB CBR IDEN NUM FLT LT GE LE GT NE EQ PLUS MINUS MUL DIV MOD INC DEC AND OR NOT ASGN COL STRC
-%left LT GT LE GE EQ NE
-%right ASGN
+
+%token ID NUM T_lt T_gt T_lteq T_gteq T_neq T_eqeq T_pl T_min T_mul T_div T_and T_or T_incr T_decr T_not T_eq WHILE INT CHAR FLOAT VOID H MAINTOK INCLUDE BREAK CONTINUE IF ELSE COUT STRING FOR OB CB OBR CBR ENDL
 
 
 %%
-S:
-    PREP type MAIN OB args CB OBR body CBR
-    | PREP type MAIN OB args CB OBR body CBR {printf("done!"); return 0;}
-	| error { yyerrok; yyclearin;}
-;
-args: "int argc"
-	| "int argc, char **argv"
-	| "int argc, char* argv[]"
-    |
-;
-type: d dType
+S
+      : START {printf("Successful parsing.\n");exit(0);}
+      ;
 
-;
-d:  L_MODIF
-	| S_MODIF
-    | SI_MODIF
-    | U_MODIF
-	|
-;
-dType: INT_TYPE
-        |FLT_TYPE
-		| C_TYPE
-		| B_TYPE
-;
-body: expression body
-		| OBR body CBR body
-		| selectionSt
-		| iterationSt
-		| RET expression
-		|
-;
-selectionSt:IF OB condition CB body elseBlock
-			|IF OB condition CB body
-			|
-;
-elseBlock: ELSE body
-;
-iterationSt: WHILE OB condition CB body
-			| DO OBR body CBR WHILE OB expression CB COL body
-			| FOR OB init COL condition COL expressionfor CB body
-			|
-;
+START
+    : INCLUDE T_lt H T_gt MAIN
+    | INCLUDE '\"' H '\"' MAIN
+    ;
 
-init: dType var ASGN value
-	| dType var
-	|
-;
-condition: var relOp value
-			|expression
-;
-var: id
-;
-id: '_' idN | idN
-;
-idN: NUM
-	| IDEN
-	|
-;
-Assignment: d dType var ASGN value Assign
-;
-Assign: ',' var ASGN value Assign
-		|
-;
-relOp: LE
-		| LT
-		| GT
-		| GE
-		| EQ
-		| NE
-;
-binOp: PLUS
-		| MINUS
-		| MUL
-		| DIV
-		| MOD
-;
-unaryOp: INC
-		| DEC
-;
-expressionfor: condition
-			| init
-			| dType id ASGN value
-			| Assignment
-			| value
-			| NUM
-;
-expression: condition COL
-			| init COL
-			| dType id ASGN value COL
-			| Assignment COL
-			| value COL
-			| NUM
-;
-value: val relOp value
-		| val binOp value
-		| val unaryOp
-		| unaryOp val
-		| val
-;
-val: literal
-	| var
-;
-literal: NUM
-		| FLT
-		| letter
-;
-letter: IDEN
-;
+
+
+MAIN
+      : VOID MAINTOK OB CB BODY
+      | INT MAINTOK BODY
+      ;
+
+BODY
+      : OBR C CBR
+      ;
+
+
+C
+      : C statement ';'
+      | C LOOPS
+      | statement ';'
+      | LOOPS
+      ;
+
+LOOPS
+      : WHILE OB COND CB LOOPBODY
+      | FOR OB ASSIGN_EXPR ';' COND ';' statement CB LOOPBODY
+      | IF OB COND CB LOOPBODY
+      | IF OB COND CB LOOPBODY ELSE LOOPBODY
+      ;
+
+
+LOOPBODY
+	  : OBR C CBR
+	  | ';'
+	  | statement ';'
+	  ;
+
+statement
+      : ASSIGN_EXPR
+      | ARITH_EXPR
+      | TERNARY_EXPR
+      | PRINT
+      ;
+
+
+COND
+      : LIT RELOP LIT
+      | LIT
+      | LIT RELOP LIT bin_boolop LIT RELOP LIT
+      | un_boolop OB LIT RELOP LIT CB
+      | un_boolop LIT RELOP LIT
+      | LIT bin_boolop LIT
+      | un_boolop OB LIT CB
+      | un_boolop LIT
+      ;
+
+
+ASSIGN_EXPR
+      : ID T_eq ARITH_EXPR
+      | TYPE ID T_eq ARITH_EXPR
+      ;
+
+ARITH_EXPR
+      : LIT
+      | LIT bin_arop ARITH_EXPR
+      | LIT bin_boolop ARITH_EXPR
+      | LIT un_arop
+      | un_arop ARITH_EXPR
+      | un_boolop ARITH_EXPR
+      ;
+
+
+TERNARY_EXPR
+      : OB COND CB '?' statement ':' statement
+      ;
+
+
+PRINT
+      : COUT T_lt T_lt STRING
+      | COUT T_lt T_lt STRING T_lt T_lt ENDL
+      ;
+LIT
+      : ID
+      | NUM
+      ;
+TYPE
+      : INT
+      | CHAR
+      | FLOAT
+      ;
+RELOP
+      : T_lt
+      | T_gt
+      | T_lteq
+      | T_gteq
+      | T_neq
+      | T_eqeq
+      ;
+
+
+bin_arop
+      : T_pl
+      | T_min
+      | T_mul
+      | T_div
+      ;
+
+bin_boolop
+      : T_and
+      | T_or
+      ;
+
+un_arop
+      : T_incr
+      | T_decr
+      ;
+
+un_boolop
+      : T_not
+      ;
 %%
 
 #include <ctype.h>
