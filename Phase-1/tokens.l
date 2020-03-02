@@ -7,7 +7,7 @@
         int scope;
         char value[100];
         char dtype[50];
-   
+
     }node;
 
     typedef struct table{
@@ -34,10 +34,9 @@ digit [0-9]
 
 \n {yylineno++;}
 
-#include\ *<{alphabet}+(\.{alphabet}*)?> {printf("%d\t%s\tPREPROCESSOR\n", yylineno, yytext); return PREP;}
+#include\ *<{alphabet}+(\.{alphabet}*)?> {printf("%d\t%s\tPREPROCESSOR\n", yylineno, yytext); return H;}
 
-return {printf("%d\t%s\tKEYW\n", yylineno, yytext); return RET;}
-main {printf("%d\t%s\tKEYW\n", yylineno, yytext); dflag = 0; return MAIN;}
+main {printf("%d\t%s\tKEYW\n", yylineno, yytext); dflag = 0; return MAINTOK;}
 for {printf("%d\t%s\tKEYW\n", yylineno, yytext); flag = 1; t_scope++; return FOR;}
 while {printf("%d\t%s\tKEYW\n", yylineno, yytext); flag = 1; t_scope++; return WHILE;}
 
@@ -45,11 +44,17 @@ if {printf("%d\t%s\tKEYW\n", yylineno, yytext); return IF;}
 else {printf("%d\t%s\tKEYW\n", yylineno, yytext); return ELSE;}
 do {printf("%d\t%s\tKEYW\n", yylineno, yytext); return DO;}
 
-int {printf("%d\t%s\tTYPE\n", yylineno, yytext);  dflag = 1; strcpy(tdType, yytext); return INT_TYPE;}
-float {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yytext); return FLT_TYPE;}
-bool {printf("%d\t%s\tTYPE\n", yylineno, yytext);  dflag = 1; strcpy(tdType, yytext);return B_TYPE;}
-char {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yytext); return C_TYPE;}
-struct {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yytext); return S_TYPE;}
+cout {printf("%d\t%s\tKEYW\n", yylineno, yytext); return COUT;}
+endl {printf("%d\t%s\tKEYW\n", yylineno, yytext); return ENDL;}
+break {printf("%d\t%s\tKEYW\n", yylineno, yytext); return BREAK;}
+continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
+
+
+int {printf("%d\t%s\tTYPE\n", yylineno, yytext);  dflag = 1; strcpy(tdType, yytext); return INT;}
+float {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yytext); return FLOAT;}
+bool {printf("%d\t%s\tTYPE\n", yylineno, yytext);  dflag = 1; strcpy(tdType, yytext);return BOOL;}
+char {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yytext); return CHAR;}
+struct {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yytext); return STRUCT;}
 
 "long" {printf("%d\t%s\tTYPE\n", yylineno, yytext); return L_MODIF;}
 "short" {printf("%d\t%s\tTYPE\n", yylineno, yytext); return S_MODIF;}
@@ -58,6 +63,8 @@ struct {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yy
 
 \( {printf("%d\t%s\tOPEN BRACKETS\n", yylineno,yytext); return OB;}
 \) {printf("%d\t%s\tCLOSE BRACKETS\n", yylineno, yytext); return CB;}
+
+
 
 \{ {if(!flag){
 		t_scope++;
@@ -68,31 +75,31 @@ struct {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yy
 {alphabet}({alphabet}|{digit})* {
                                 if(dflag)
                                     insert(symTable, &count, t_scope, tdType, yytext);printf("%d\t%s\tIDENTIFIER\n", yylineno, yytext);
-                                dflag = 0;    
-                                return IDEN;}
+                                dflag = 0;
+                                return ID;}
 
 {digit}+ {printf("%d\t%s\tINTEGER\n", yylineno, yytext); return NUM;}
 {digit}+\.{digit}+(E(\+|\-)?{digit}+)? {printf("%d\t%s\tFLOATING POINT NUMBER\n", yylineno, yytext); return FLT;}
 
-"==" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return EQ;}
-"!=" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return NE;}
-">=" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return GE;}
-"<=" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return LE;}
-"<" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return LT;}
-">" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return GT;}
-\+\+ {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return INC;}
--- {printf("%d\t%s\tUNARY OPERATORS\n", yylineno, yytext); return DEC;}
+"==" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_eqeq;}
+"!=" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_neq;}
+">=" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_gteq;}
+"<=" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_lteq;}
+"<" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_lt;}
+">" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_gt;}
+\+\+ {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_incr;}
+-- {printf("%d\t%s\tUNARY OPERATORS\n", yylineno, yytext); return T_decr;}
 
-\+ {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return PLUS;}
-\- {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return MINUS;}
-\/ {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return DIV;}
-\* {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return MUL;}
-% {printf("%d\t%s\t BINARY OPERATORS\n", yylineno, yytext); return MOD;}
-&& {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return AND;}
-\|\| {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return OR;}
-! {printf("%d\t%s\tLOGICAL OPERATORS\n", yylineno, yytext); return NOT;}
+\+ {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_pl;}
+\- {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_min;}
+\/ {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_div;}
+\* {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_mul;}
+% {printf("%d\t%s\t BINARY OPERATORS\n", yylineno, yytext); return T_mod;}
+&& {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_and;}
+\|\| {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_or;}
+! {printf("%d\t%s\tLOGICAL OPERATORS\n", yylineno, yytext); return T_neq;}
 
-= {printf("%d\t%s\tASSIGNMENT\n", yylineno, yytext); return ASGN;}
+= {printf("%d\t%s\tASSIGNMENT\n", yylineno, yytext); return T_eq;}
 
 ; {printf("%d\t%s\tTERMINATOR\n", yylineno, yytext); return COL;}
 
@@ -126,7 +133,7 @@ void insert(node* head, int* idx, int scope, char* dtype, char* val){
     }
 
 
-    // node* newEntry = (node*) malloc(sizeof(node));
+    /* // node* newEntry = (node*) malloc(sizeof(node));
     // newEntry->scope = scope;
     // strcpy(newEntry->value, val);
     // newEntry->next = NULL;
@@ -136,7 +143,7 @@ void insert(node* head, int* idx, int scope, char* dtype, char* val){
     // else{
     //     newEntry->next = head;
     //     head = newEntry;
-    // }
+    // } */
 }
 
 void displaySymTable()
@@ -146,7 +153,7 @@ void displaySymTable()
                 printf("Scope %d\t",symTable[i].scope);
                 printf("Token is %s\t", symTable[i].value);
                 printf("data type is %s\n", symTable[i].dtype);
-        }       
+        }
 }
 
 int yywrap(){
