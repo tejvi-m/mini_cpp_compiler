@@ -7,7 +7,7 @@
         int scope;
         char value[100];
         char dtype[50];
-
+        int line_num;
     }node;
 
     typedef struct table{
@@ -19,7 +19,7 @@
     int flag = 0;
     int dflag = 0;
     char tdType[50];
-    void insert(node* head, int* idx, int scope, char* dtype, char* val);
+    void insert(node* head, int* idx, int scope, char* dtype, char* val, int line_num);
     void displaySymTable();
 %}
 
@@ -41,7 +41,7 @@ char {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yyte
 for {printf("%d\t%s\tKEYW\n", yylineno, yytext); flag = 1; t_scope++; return FOR;}
 while {printf("%d\t%s\tKEYW\n", yylineno, yytext); flag = 1; t_scope++; return WHILE;}
 
-return {printf("%d\t%s\tKEYW\n", yylineno, yytext); return RETURN;} 
+return {printf("%d\t%s\tKEYW\n", yylineno, yytext); return RETURN;}
 if {printf("%d\t%s\tKEYW\n", yylineno, yytext); return IF;}
 else {printf("%d\t%s\tKEYW\n", yylineno, yytext); return ELSE;}
 
@@ -53,7 +53,7 @@ continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
 
 {alphabet}({alphabet}|{digit})* {
                                 if(dflag)
-                                    insert(symTable, &count, t_scope, tdType, yytext);printf("%d\t%s\tIDENTIFIER\n", yylineno, yytext);
+                                    insert(symTable, &count, t_scope, tdType, yytext, yylineno);printf("%d\t%s\tIDENTIFIER\n", yylineno, yytext);
                                 dflag = 0;
                                 return ID;}
 
@@ -113,7 +113,7 @@ continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
 
 %%
 
-void insert(node* head, int* idx, int scope, char* dtype, char* val){
+void insert(node* head, int* idx, int scope, char* dtype, char* val, int line_num){
     int present = 0;
     for(int i = 0; i < *idx; i++){
             if(!strcmp(head[i].value, val) && head[i].scope == scope){
@@ -124,6 +124,7 @@ void insert(node* head, int* idx, int scope, char* dtype, char* val){
 
     if(!present){
         head[*idx].scope = scope;
+        head[*idx].line_num = line_num;
         strcpy(head[*idx].value, val);
         strcpy(head[*idx].dtype, dtype);
         *idx = *idx + 1;
@@ -146,10 +147,12 @@ void insert(node* head, int* idx, int scope, char* dtype, char* val){
 
 void displaySymTable()
 {
+        printf("printing symbol table: \n");
         for(int i = 0; i < count; i++)
         {
                 printf("Scope %d\t",symTable[i].scope);
                 printf("Token is %s\t", symTable[i].value);
+                printf("At line number %d\t", symTable[i].line_num);
                 printf("data type is %s\n", symTable[i].dtype);
         }
 }
