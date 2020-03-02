@@ -18,6 +18,7 @@ extern void displaySymTable();
 %%
 S
       : START {printf("Successful parsing.\n");exit(0);}
+    |error { yyerrok; yyclearin;}
       ;
 
 START
