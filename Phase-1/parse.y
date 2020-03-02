@@ -28,7 +28,7 @@ START
 
 
 MAIN
-      : VOID MAINTOK OB CB BODY
+      : VOID MAINTOK BODY
       | INT MAINTOK BODY
       ;
 

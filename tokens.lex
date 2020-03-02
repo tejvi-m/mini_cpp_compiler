@@ -36,7 +36,7 @@ long|short|unsigned|signed printf("%d\t%s\tDATATYPE MODIFIERS\n", yylineno, yyte
 \+|\-|\/|\*|% printf("%d\t%s\t BINARY OPERATORS\n", yylineno, yytext);
 &&|\|\||! printf("%d\t%s\tLOGICAL OPERATORS\n", yylineno, yytext);
 
-= printf("%d\t%s\tASSIGNMENT\n", yylineno, yytext);
+"=" printf("%d\t%s\tASSIGNMENT\n", yylineno, yytext);
 
 ; printf("%d\t%s\tTERMINATOR\n", yylineno, yytext);
 

@@ -34,11 +34,22 @@ digit [0-9]
 
 \n {yylineno++;}
 
-#include\ *<{alphabet}+(\.{alphabet}*)?> {printf("%d\t%s\tPREPROCESSOR\n", yylineno, yytext); return H;}
+int {printf("%d\t%s\tTYPE\n", yylineno, yytext);  dflag = 1; strcpy(tdType, yytext); return INT;}
+float {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yytext); return FLOAT;}
+char {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yytext); return CHAR;}
 
-#include {printf("%d\t%s\tKEYW\n", yylineno, yytext); dflag = 0; return INCLUDE;}
+{alphabet}({alphabet}|{digit})* {
+                                if(dflag)
+                                    insert(symTable, &count, t_scope, tdType, yytext);printf("%d\t%s\tIDENTIFIER\n", yylineno, yytext);
+                                dflag = 0;
+                                return ID;}
 
-main {printf("%d\t%s\tKEYW\n", yylineno, yytext); dflag = 0; return MAINTOK;}
+"#include"  {printf("%d\t%s\tKEYW\n", yylineno, yytext); dflag = 0; return INCLUDE;}
+
+{alphabet}({alphabet}|{digit})*"\.h"?  {printf("%d\t%s\tPREPROCESSOR\n", yylineno, yytext); return H;}
+
+
+"main()" {printf("%d\t%s\tKEYW\n", yylineno, yytext); dflag = 0; return MAINTOK;}
 for {printf("%d\t%s\tKEYW\n", yylineno, yytext); flag = 1; t_scope++; return FOR;}
 while {printf("%d\t%s\tKEYW\n", yylineno, yytext); flag = 1; t_scope++; return WHILE;}
 
@@ -52,18 +63,6 @@ break {printf("%d\t%s\tKEYW\n", yylineno, yytext); return BREAK;}
 continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
 
 
-int {printf("%d\t%s\tTYPE\n", yylineno, yytext);  dflag = 1; strcpy(tdType, yytext); return INT;}
-float {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yytext); return FLOAT;}
-char {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yytext); return CHAR;}
-void {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yytext); return VOID;}
-
-{alphabet}({alphabet}|{digit})* {
-                                if(dflag)
-                                    insert(symTable, &count, t_scope, tdType, yytext);printf("%d\t%s\tIDENTIFIER\n", yylineno, yytext);
-                                dflag = 0;
-                                return ID;}
-
-{alphabet}({alphabet}|{digit})*"\.h"? {printf("%d\t%s\tPREPROCESSOR\n", yylineno, yytext); dflag = 0; return H;}
 
 \( {printf("%d\t%s\tOPEN BRACKETS\n", yylineno,yytext); return OB;}
 \) {printf("%d\t%s\tCLOSE BRACKETS\n", yylineno, yytext); return CB;}
@@ -105,7 +104,7 @@ void {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yyte
 
 " " ;
 
-
+\"(\\.|[^"\\])*\" {printf("%d\t%s\tSTRING CONSTANT\n", yylineno, yytext); return STRING;}
 
 
 . {printf("%d\t%s\ERROR\n", yylineno, yytext);}
