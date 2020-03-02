@@ -5,7 +5,8 @@
     #include "y.tab.h"
     typedef struct node{
         int scope;
-        char value[100];
+        int value;
+        char name[100];
         char dtype[50];
         int line_num;
     }node;
@@ -113,10 +114,10 @@ continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
 
 %%
 
-void insert(node* head, int* idx, int scope, char* dtype, char* val, int line_num){
+void insert(node* head, int* idx, int scope, char* dtype, char* name, int line_num){
     int present = 0;
     for(int i = 0; i < *idx; i++){
-            if(!strcmp(head[i].value, val) && head[i].scope == scope){
+            if(!strcmp(head[i].name, name) && head[i].scope == scope){
                 present = 1;
                 break;
             }
@@ -125,7 +126,8 @@ void insert(node* head, int* idx, int scope, char* dtype, char* val, int line_nu
     if(!present){
         head[*idx].scope = scope;
         head[*idx].line_num = line_num;
-        strcpy(head[*idx].value, val);
+        head[*idx].value = -1;
+        strcpy(head[*idx].name, name);
         strcpy(head[*idx].dtype, dtype);
         *idx = *idx + 1;
 
@@ -148,12 +150,14 @@ void insert(node* head, int* idx, int scope, char* dtype, char* val, int line_nu
 void displaySymTable()
 {
         printf("printing symbol table: \n");
+        printf("Token\t\tData type\tScope\t\tValue\t\tLine number\n");
         for(int i = 0; i < count; i++)
         {
-                printf("Scope %d\t",symTable[i].scope);
-                printf("Token is %s\t", symTable[i].value);
+                printf("%s\t\t%s\t\t%d\t\t%d\t\t%d\n", symTable[i].name, symTable[i].dtype, symTable[i].scope, symTable[i].value, symTable[i].line_num );
+                /* printf("Scope %d\t",symTable[i].scope);
+                printf("Token is %s\t", symTable[i].name);
                 printf("At line number %d\t", symTable[i].line_num);
-                printf("data type is %s\n", symTable[i].dtype);
+                printf("data type is %s\n", symTable[i].dtype); */
         }
 }
 
