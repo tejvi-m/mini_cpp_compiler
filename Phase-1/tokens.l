@@ -42,7 +42,7 @@ while {printf("%d\t%s\tKEYW\n", yylineno, yytext); flag = 1; t_scope++; return W
 
 if {printf("%d\t%s\tKEYW\n", yylineno, yytext); return IF;}
 else {printf("%d\t%s\tKEYW\n", yylineno, yytext); return ELSE;}
-do {printf("%d\t%s\tKEYW\n", yylineno, yytext); return DO;}
+
 
 cout {printf("%d\t%s\tKEYW\n", yylineno, yytext); return COUT;}
 endl {printf("%d\t%s\tKEYW\n", yylineno, yytext); return ENDL;}
@@ -52,14 +52,7 @@ continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
 
 int {printf("%d\t%s\tTYPE\n", yylineno, yytext);  dflag = 1; strcpy(tdType, yytext); return INT;}
 float {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yytext); return FLOAT;}
-bool {printf("%d\t%s\tTYPE\n", yylineno, yytext);  dflag = 1; strcpy(tdType, yytext);return BOOL;}
 char {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yytext); return CHAR;}
-struct {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yytext); return STRUCT;}
-
-"long" {printf("%d\t%s\tTYPE\n", yylineno, yytext); return L_MODIF;}
-"short" {printf("%d\t%s\tTYPE\n", yylineno, yytext); return S_MODIF;}
-"unsigned" {printf("%d\t%s\tTYPE\n", yylineno, yytext); return U_MODIF;}
-"signed" {printf("%d\t%s\tDATATYPE MODIFIERS\n", yylineno, yytext); return SI_MODIF;}
 
 \( {printf("%d\t%s\tOPEN BRACKETS\n", yylineno,yytext); return OB;}
 \) {printf("%d\t%s\tCLOSE BRACKETS\n", yylineno, yytext); return CB;}
@@ -94,14 +87,12 @@ struct {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yy
 \- {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_min;}
 \/ {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_div;}
 \* {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_mul;}
-% {printf("%d\t%s\t BINARY OPERATORS\n", yylineno, yytext); return T_mod;}
 && {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_and;}
 \|\| {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_or;}
 ! {printf("%d\t%s\tLOGICAL OPERATORS\n", yylineno, yytext); return T_neq;}
 
 = {printf("%d\t%s\tASSIGNMENT\n", yylineno, yytext); return T_eq;}
 
-; {printf("%d\t%s\tTERMINATOR\n", yylineno, yytext); return COL;}
 
 \t ;
 
