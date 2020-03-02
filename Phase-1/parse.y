@@ -17,7 +17,7 @@ extern void displaySymTable();
 
 %%
 S
-      : START {printf("Successful parsing.\n");exit(0);}
+      : START {printf("Successful parsing.\n");displaySymTable();exit(0);}
     |error { yyerrok; yyclearin;}
       ;
 
@@ -104,6 +104,8 @@ TERNARY_EXPR
 PRINT
       : COUT T_lt T_lt STRING
       | COUT T_lt T_lt STRING T_lt T_lt ENDL
+      | COUT T_lt T_lt ENDL
+
       ;
 LIT
       : ID
