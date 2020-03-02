@@ -36,6 +36,8 @@ digit [0-9]
 
 #include\ *<{alphabet}+(\.{alphabet}*)?> {printf("%d\t%s\tPREPROCESSOR\n", yylineno, yytext); return H;}
 
+#include {printf("%d\t%s\tKEYW\n", yylineno, yytext); dflag = 0; return INCLUDE;}
+
 main {printf("%d\t%s\tKEYW\n", yylineno, yytext); dflag = 0; return MAINTOK;}
 for {printf("%d\t%s\tKEYW\n", yylineno, yytext); flag = 1; t_scope++; return FOR;}
 while {printf("%d\t%s\tKEYW\n", yylineno, yytext); flag = 1; t_scope++; return WHILE;}
@@ -53,6 +55,15 @@ continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
 int {printf("%d\t%s\tTYPE\n", yylineno, yytext);  dflag = 1; strcpy(tdType, yytext); return INT;}
 float {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yytext); return FLOAT;}
 char {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yytext); return CHAR;}
+void {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yytext); return VOID;}
+
+{alphabet}({alphabet}|{digit})* {
+                                if(dflag)
+                                    insert(symTable, &count, t_scope, tdType, yytext);printf("%d\t%s\tIDENTIFIER\n", yylineno, yytext);
+                                dflag = 0;
+                                return ID;}
+
+{alphabet}({alphabet}|{digit})*"\.h"? {printf("%d\t%s\tPREPROCESSOR\n", yylineno, yytext); dflag = 0; return H;}
 
 \( {printf("%d\t%s\tOPEN BRACKETS\n", yylineno,yytext); return OB;}
 \) {printf("%d\t%s\tCLOSE BRACKETS\n", yylineno, yytext); return CB;}
@@ -65,15 +76,11 @@ char {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yyte
 	printf("%d\t%s\tOPEN BRACES\n", yylineno, yytext); return OBR;}
 \} {t_scope--;printf("%d\t%s\tCLOSE BRACES\n", yylineno, yytext); return CBR;}
 
-{alphabet}({alphabet}|{digit})* {
-                                if(dflag)
-                                    insert(symTable, &count, t_scope, tdType, yytext);printf("%d\t%s\tIDENTIFIER\n", yylineno, yytext);
-                                dflag = 0;
-                                return ID;}
 
 {digit}+ {printf("%d\t%s\tINTEGER\n", yylineno, yytext); return NUM;}
 {digit}+\.{digit}+(E(\+|\-)?{digit}+)? {printf("%d\t%s\tFLOATING POINT NUMBER\n", yylineno, yytext); return FLT;}
 
+\".*\" {printf("%d\t%s\tSTRING CONSTANT\n", yylineno, yytext); return STRING;}
 "==" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_eqeq;}
 "!=" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_neq;}
 ">=" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_gteq;}
@@ -98,7 +105,7 @@ char {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yyte
 
 " " ;
 
-\"(\\.|[^"\\])*\" {printf("%d\t%s\tSTRING CONSTANT\n", yylineno, yytext); return STRC;}
+
 
 
 . {printf("%d\t%s\ERROR\n", yylineno, yytext);}
