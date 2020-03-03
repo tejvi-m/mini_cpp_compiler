@@ -12,6 +12,7 @@ extern int SymTable[100];
 extern int t_scope;
 extern int count;
 extern void displaySymTable();
+extern int find(int  t_scope, char *yytext);
 extern void update(char* name, int value, int scope);
 
 %}
@@ -49,7 +50,7 @@ C
       | statement TERMINATOR
       | LOOPS
       | C OBR C CBR
-      | error TERMINATOR  
+      | error TERMINATOR
       ;
 
 LOOPS

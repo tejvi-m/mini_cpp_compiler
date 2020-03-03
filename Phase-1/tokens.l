@@ -23,8 +23,9 @@
     int flag = 0;
     int dflag = 0;
     char tdType[50];
-    void insert(node* head, int* idx, int scope, char* dtype, char* val, int line_num);
+    int insert(node* head, int* idx, int scope, char* dtype, char* val, int line_num);
     void displaySymTable();
+    int find(int  t_scope, char *name);
     void update(char* name, int value, int scope);
 %}
 
@@ -59,8 +60,15 @@ continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
 {alphabet}({alphabet}|{digit})* {
                                 yylval = strdup(yytext);
                                 if(dflag)
-                                    insert(symTable, &count, t_scope, tdType, yytext, yylineno);printf("%d\t%s\tIDENTIFIER\n", yylineno, yytext);
-                                dflag = 0;
+                                    if(insert(symTable, &count, t_scope, tdType, yytext, yylineno)) printf("%d\t%s\tIDENTIFIER\n", yylineno, yytext);
+                                    else{
+                                      yyerror("Variable redeclared");
+                                    }
+                                else{
+                                  if (!find(t_scope, yytext)) {
+                                    yyerror("variable not declared");
+                                  }
+                                }
                                 return ID;}
 
 "#include"  {printf("%d\t%s\tKEYW\n", yylineno, yytext); dflag = 0; return INCLUDE;}
@@ -105,7 +113,7 @@ continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
 ! {printf("%d\t%s\tLOGICAL OPERATORS\n", yylineno, yytext); return T_neq;}
 
 = {printf("%d\t%s\tASSIGNMENT\n", yylineno, yytext); return T_eq;}
-";" {printf("%d\t%s\tTERMINATOR\n", yylineno, yytext); return TERMINATOR;}
+";" {printf("%d\t%s\tTERMINATOR\n", yylineno, yytext); dflag = 0; return TERMINATOR;}
 
 \t ;
 
@@ -119,7 +127,7 @@ continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
 
 %%
 
-void insert(node* head, int* idx, int scope, char* dtype, char* name, int line_num){
+int insert(node* head, int* idx, int scope, char* dtype, char* name, int line_num){
     int present = 0;
     for(int i = 0; i < *idx; i++){
             if(!strcmp(head[i].name, name) && head[i].scope == scope){
@@ -136,7 +144,10 @@ void insert(node* head, int* idx, int scope, char* dtype, char* name, int line_n
         strcpy(head[*idx].dtype, dtype);
         *idx = *idx + 1;
 
+        return 1;
     }
+
+    return 0;
 }
 
 void displaySymTable()
@@ -162,6 +173,17 @@ void update(char* name, int value, int scope){
   }
 }
 
+int find(int  scope, char *name){
+  int present = 0;
+  for(int i = 0; i < count; i++)
+  {
+    if(!strcmp(symTable[i].name, name) && symTable[i].scope == scope){
+        present = 1;
+        break;
+    }
+  }
+    return present;
+  }
 int yywrap(){
     return 1;
 }
