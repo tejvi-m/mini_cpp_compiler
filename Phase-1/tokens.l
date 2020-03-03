@@ -177,7 +177,7 @@ int find(int  scope, char *name){
   int present = 0;
   for(int i = 0; i < count; i++)
   {
-    if(!strcmp(symTable[i].name, name) && symTable[i].scope == scope){
+    if(!strcmp(symTable[i].name, name) && symTable[i].scope <= scope){
         present = 1;
         break;
     }
