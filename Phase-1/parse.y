@@ -101,15 +101,15 @@ ASSIGN_EXPR
           yyerror("variable not declared");
         }
 
-      update($1, atoi($3), t_scope);}
+      update($1, atoi($3), t_scope);
+    }
 
       | TYPE ID T_eq ARITH_EXPR {
-        printf("dt: %s\n", $2);
         if(!insert(&count, t_scope, $1, $2, yylineno))
               yyerror("Variable redeclared");
-              /* printf("holl\n"); */
-        update($2, atoi($4), t_scope);}
+        update($2, atoi($4), t_scope);
       }
+
       ;
 
 
