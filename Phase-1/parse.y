@@ -48,6 +48,7 @@ C
       | C LOOPS
       | statement TERMINATOR
       | LOOPS
+      | C OBR C CBR
       ;
 
 LOOPS
