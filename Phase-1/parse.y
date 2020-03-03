@@ -5,15 +5,19 @@
 #include <string.h>
 #define YYSTYPE char *
 
+extern int yylineno;
 int valid=1;
 int yylex();
 int yyerror(const char *s);
 extern int SymTable[100];
+extern char* tdType;
 extern int t_scope;
+extern int dflag;
 extern int count;
 extern void displaySymTable();
 extern int find(int  t_scope, char *yytext);
 extern void update(char* name, int value, int scope);
+extern     int insert(int* idx, int scope, char* dtype, char* val, int line_num);
 
 %}
 
@@ -91,8 +95,21 @@ COND
 
 
 ASSIGN_EXPR
-      : ID T_eq ARITH_EXPR {} { update($1, atoi($3), t_scope);}
-      | TYPE ID T_eq ARITH_EXPR { update($2, atoi($4), t_scope);}
+      : ID T_eq ARITH_EXPR {
+
+        if (!find(t_scope, $1)) {
+          yyerror("variable not declared");
+        }
+
+      update($1, atoi($3), t_scope);}
+
+      | TYPE ID T_eq ARITH_EXPR {
+        printf("dt: %s\n", $2);
+        if(!insert(&count, t_scope, $1, $2, yylineno))
+              yyerror("Variable redeclared");
+              /* printf("holl\n"); */
+        update($2, atoi($4), t_scope);}
+      }
       ;
 
 

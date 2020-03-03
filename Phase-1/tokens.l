@@ -23,7 +23,7 @@
     int flag = 0;
     int dflag = 0;
     char tdType[50];
-    int insert(node* head, int* idx, int scope, char* dtype, char* val, int line_num);
+    int insert(int* idx, int scope, char* dtype, char* val, int line_num);
     void displaySymTable();
     int find(int  t_scope, char *name);
     void update(char* name, int value, int scope);
@@ -40,9 +40,9 @@ digit [0-9]
 
 \n {yylineno++;}
 
-int {printf("%d\t%s\tTYPE\n", yylineno, yytext);  dflag = 1; strcpy(tdType, yytext); return INT;}
-float {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yytext); return FLOAT;}
-char {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yytext); return CHAR;}
+int {printf("%d\t%s\tTYPE\n", yylineno, yytext);  dflag = 1; strcpy(tdType, yytext);   yylval = strdup(yytext); return INT;}
+float {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yytext); yylval = strdup(yytext); return FLOAT;}
+char {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yytext); yylval = strdup(yytext); return CHAR;}
 "main()" {printf("%d\t%s\tKEYW\n", yylineno, yytext); dflag = 0; return MAINTOK;}
 for {printf("%d\t%s\tKEYW\n", yylineno, yytext); flag = 1; t_scope++; return FOR;}
 while {printf("%d\t%s\tKEYW\n", yylineno, yytext); flag = 1; t_scope++; return WHILE;}
@@ -59,16 +59,7 @@ continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
 
 {alphabet}({alphabet}|{digit})* {
                                 yylval = strdup(yytext);
-                                if(dflag)
-                                    if(insert(symTable, &count, t_scope, tdType, yytext, yylineno)) printf("%d\t%s\tIDENTIFIER\n", yylineno, yytext);
-                                    else{
-                                      yyerror("Variable redeclared");
-                                    }
-                                else{
-                                  if (!find(t_scope, yytext)) {
-                                    yyerror("variable not declared");
-                                  }
-                                }
+
                                 return ID;}
 
 "#include"  {printf("%d\t%s\tKEYW\n", yylineno, yytext); dflag = 0; return INCLUDE;}
@@ -127,21 +118,22 @@ continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
 
 %%
 
-int insert(node* head, int* idx, int scope, char* dtype, char* name, int line_num){
+int insert(int* idx, int scope, char* dtype, char* name, int line_num){
     int present = 0;
+    printf("present\n");
     for(int i = 0; i < *idx; i++){
-            if(!strcmp(head[i].name, name) && head[i].scope == scope){
+            if(!strcmp(symTable[i].name, name) && symTable[i].scope == scope){
                 present = 1;
                 break;
             }
     }
 
     if(!present){
-        head[*idx].scope = scope;
-        head[*idx].line_num = line_num;
-        head[*idx].value = 0;
-        strcpy(head[*idx].name, name);
-        strcpy(head[*idx].dtype, dtype);
+        symTable[*idx].scope = scope;
+        symTable[*idx].line_num = line_num;
+        symTable[*idx].value = 0;
+        strcpy(symTable[*idx].name, name);
+        strcpy(symTable[*idx].dtype, dtype);
         *idx = *idx + 1;
 
         return 1;
