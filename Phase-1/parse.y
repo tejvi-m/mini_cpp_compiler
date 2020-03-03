@@ -118,44 +118,48 @@ ASSIGN_EXPR
       }
 
       | TYPE ID COMMA X {
-        /* printf("do i get here %s\n", $1); */
         strcpy(tdType, $1);
         dflag = 1;
 
         if(!insert(&count, t_scope, $1, $2, yylineno))
               yyerror("Variable redeclared");
-      }
+            }
       |
       TYPE ID T_eq ARITH_EXPR COMMA X {
-        printf("do i get here\n");
         strcpy(tdType, $1);
         dflag = 1;
         if(!insert(&count, t_scope, $1, $2, yylineno))
               yyerror("Variable redeclared");
+        update($2, atoi($4), t_scope);
       }
       ;
 
 X : ID COMMA X {
-  if(!insert(&count, t_scope, tdType, $1, yylineno))
-          printf("redeclared: %s\n", $1);
-          yyerror("Variable redeclared");
+  if(!insert(&count, t_scope, tdType, $1, yylineno)){
+    printf("redeclared: %s\n", $1);
+    yyerror("Variable redeclared");
   }
-
+}
   |
   ID {
-    if(!insert(&count, t_scope, tdType, $1, yylineno))
-    printf("redeclared: %s\n", $1);
-    yyerror("Variable redeclared");
+    if(!insert(&count, t_scope, tdType, $1, yylineno)){
+      printf("redeclared: %s\n", $1);
+      yyerror("Variable redeclared");
     }
+  }
   | ID T_eq ARITH_EXPR COMMA X {
-    if(!insert(&count, t_scope, tdType, $1, yylineno))
-    printf("redeclared: %s\n", $1);
-    yyerror("Variable redeclared");
+    if(!insert(&count, t_scope, tdType, $1, yylineno)){
+      printf("redeclared: %s\n", $1);
+      yyerror("Variable redeclared");
+    }
+    update($1, atoi($3), t_scope);
   }
   | ID T_eq ARITH_EXPR {
-    if(!insert(&count, t_scope, tdType, $1, yylineno))
-    printf("redeclared: %s\n", $1);
-    yyerror("Variable redeclared");
+    if(!insert(&count, t_scope, tdType, $1, yylineno)){
+      printf("redeclared: %s\n", $1);
+      yyerror("Variable redeclared");
+    }
+    update($1, atoi($3), t_scope);
   }
 
 ARITH_EXPR
@@ -180,7 +184,11 @@ PRINT
 
       ;
 LIT
-      : ID
+      : ID {
+        if (!find(t_scope, $1)) {
+            yyerror("variable not declared");
+        }
+      }
       | NUM
       ;
 TYPE
@@ -225,7 +233,7 @@ int yyerror(const char *s)
 {
   	extern int yylineno;
   	valid =0;
-  	printf("Line no: %d \n The error is: %s\n",yylineno,s);
+  	printf("\n\nERROR: line number: %d - error: %s\n\n",yylineno,s);
 
 }
 

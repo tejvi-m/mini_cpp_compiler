@@ -59,7 +59,7 @@ continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
 
 {alphabet}({alphabet}|{digit})* {
                                 yylval = strdup(yytext);
-
+                                printf("%d\t%s\tID\n", yylineno, yytext);
                                 return ID;}
 
 "#include"  {printf("%d\t%s\tKEYW\n", yylineno, yytext); dflag = 0; return INCLUDE;}
@@ -120,7 +120,7 @@ continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
 
 int insert(int* idx, int scope, char* dtype, char* name, int line_num){
     int present = 0;
-    printf("present\n");
+    
     for(int i = 0; i < *idx; i++){
             if(!strcmp(symTable[i].name, name) && symTable[i].scope == scope){
                 present = 1;
