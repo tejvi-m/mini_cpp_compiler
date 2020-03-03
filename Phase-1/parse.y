@@ -65,6 +65,7 @@ LOOPBODY
 	  : OBR C CBR
 	  | TERMINATOR
 	  | statement TERMINATOR
+    | OBR CBR
 	  ;
 
 statement
