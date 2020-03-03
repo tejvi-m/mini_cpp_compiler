@@ -105,7 +105,7 @@ continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
 
 = {printf("%d\t%s\tASSIGNMENT\n", yylineno, yytext); return T_eq;}
 ";" {printf("%d\t%s\tTERMINATOR\n", yylineno, yytext); dflag = 0; return TERMINATOR;}
-
+"," {printf("%d\t%s\tCOMMA\n", yylineno, yytext); return COMMA;}
 \t ;
 
 " " ;

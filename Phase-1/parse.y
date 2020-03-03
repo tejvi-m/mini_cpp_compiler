@@ -22,7 +22,7 @@ extern     int insert(int* idx, int scope, char* dtype, char* val, int line_num)
 %}
 
 %define parse.error verbose
-%token ID NUM T_lt T_gt STRC TERMINATOR RETURN FLT T_lteq T_gteq T_neq T_eqeq T_pl T_min T_mul T_div T_and T_or T_incr T_decr T_not T_eq WHILE INT CHAR FLOAT VOID H MAINTOK INCLUDE BREAK CONTINUE IF ELSE COUT STRING FOR OB CB OBR CBR ENDL
+%token ID NUM T_lt T_gt COMMA STRC TERMINATOR RETURN FLT T_lteq T_gteq T_neq T_eqeq T_pl T_min T_mul T_div T_and T_or T_incr T_decr T_not T_eq WHILE INT CHAR FLOAT VOID H MAINTOK INCLUDE BREAK CONTINUE IF ELSE COUT STRING FOR OB CB OBR CBR ENDL
 
 
 %%
@@ -110,8 +110,38 @@ ASSIGN_EXPR
         update($2, atoi($4), t_scope);
       }
 
+    |
+      TYPE ID {
+
+        if(!insert(&count, t_scope, $1, $2, yylineno))
+              yyerror("Variable redeclared");
+      }
+
+      | TYPE ID COMMA X {
+        printf("got this\n");
+        if(!insert(&count, t_scope, $1, $2, yylineno))
+              yyerror("Variable redeclared");
+      }
+      |
+      TYPE ID T_eq ARITH_EXPR COMMA X {
+        if(!insert(&count, t_scope, $1, $2, yylineno))
+              yyerror("Variable redeclared");
+      }
       ;
 
+X : ID COMMA X{
+    printf("Also encountered %s\n", $1);
+  }
+  |
+  ID {
+
+    }
+  | ID T_eq ARITH_EXPR COMMA X {
+
+  }
+  | ID T_eq ARITH_EXPR {
+
+  }
 
 ARITH_EXPR
       : LIT
