@@ -49,6 +49,7 @@ C
       | statement TERMINATOR
       | LOOPS
       | C OBR C CBR
+      | error TERMINATOR  
       ;
 
 LOOPS
