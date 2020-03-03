@@ -10,7 +10,7 @@ int valid=1;
 int yylex();
 int yyerror(const char *s);
 extern int SymTable[100];
-extern char* tdType;
+extern char tdType[50];
 extern int t_scope;
 extern int dflag;
 extern int count;
@@ -118,29 +118,44 @@ ASSIGN_EXPR
       }
 
       | TYPE ID COMMA X {
-        printf("got this\n");
+        /* printf("do i get here %s\n", $1); */
+        strcpy(tdType, $1);
+        dflag = 1;
+
         if(!insert(&count, t_scope, $1, $2, yylineno))
               yyerror("Variable redeclared");
       }
       |
       TYPE ID T_eq ARITH_EXPR COMMA X {
+        printf("do i get here\n");
+        strcpy(tdType, $1);
+        dflag = 1;
         if(!insert(&count, t_scope, $1, $2, yylineno))
               yyerror("Variable redeclared");
       }
       ;
 
-X : ID COMMA X{
-    printf("Also encountered %s\n", $1);
+X : ID COMMA X {
+  if(!insert(&count, t_scope, tdType, $1, yylineno))
+          printf("redeclared: %s\n", $1);
+          yyerror("Variable redeclared");
   }
+
   |
   ID {
-
+    if(!insert(&count, t_scope, tdType, $1, yylineno))
+    printf("redeclared: %s\n", $1);
+    yyerror("Variable redeclared");
     }
   | ID T_eq ARITH_EXPR COMMA X {
-
+    if(!insert(&count, t_scope, tdType, $1, yylineno))
+    printf("redeclared: %s\n", $1);
+    yyerror("Variable redeclared");
   }
   | ID T_eq ARITH_EXPR {
-
+    if(!insert(&count, t_scope, tdType, $1, yylineno))
+    printf("redeclared: %s\n", $1);
+    yyerror("Variable redeclared");
   }
 
 ARITH_EXPR
