@@ -25,7 +25,7 @@
     char tdType[50];
     void insert(node* head, int* idx, int scope, char* dtype, char* val, int line_num);
     void displaySymTable();
-    void update(char* name, int value);
+    void update(char* name, int value, int scope);
 %}
 
 
@@ -131,25 +131,12 @@ void insert(node* head, int* idx, int scope, char* dtype, char* name, int line_n
     if(!present){
         head[*idx].scope = scope;
         head[*idx].line_num = line_num;
-        head[*idx].value = -1;
+        head[*idx].value = 0;
         strcpy(head[*idx].name, name);
         strcpy(head[*idx].dtype, dtype);
         *idx = *idx + 1;
 
     }
-
-
-    /* // node* newEntry = (node*) malloc(sizeof(node));
-    // newEntry->scope = scope;
-    // strcpy(newEntry->value, val);
-    // newEntry->next = NULL;
-    // if(!head){
-    //     head = newEntry;
-    // }
-    // else{
-    //     newEntry->next = head;
-    //     head = newEntry;
-    // } */
 }
 
 void displaySymTable()
@@ -166,10 +153,10 @@ void displaySymTable()
         }
 }
 
-void update(char* name, int value){
+void update(char* name, int value, int scope){
   for(int i = 0; i < count; i++)
   {
-    if(!strcmp(symTable[i].name, name)){
+    if(!strcmp(symTable[i].name, name) && symTable[i].scope == scope){
         symTable[i].value = value;
     }
   }

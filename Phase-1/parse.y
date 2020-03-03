@@ -12,7 +12,7 @@ extern int SymTable[100];
 extern int t_scope;
 extern int count;
 extern void displaySymTable();
-extern void update(char* name, int value);
+extern void update(char* name, int value, int scope);
 
 %}
 
@@ -87,10 +87,8 @@ COND
 
 
 ASSIGN_EXPR
-      : ID T_eq ARITH_EXPR
-      | TYPE ID T_eq ARITH_EXPR {printf("symbol:%s\n", $2);
-      update($2, atoi($4));
-    }
+      : ID T_eq ARITH_EXPR {} { update($1, atoi($3), t_scope);}
+      | TYPE ID T_eq ARITH_EXPR { update($2, atoi($4), t_scope);}
       ;
 
 
