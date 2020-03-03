@@ -2,6 +2,9 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#define YYSTYPE char *
+
 int valid=1;
 int yylex();
 int yyerror(const char *s);
@@ -9,6 +12,7 @@ extern int SymTable[100];
 extern int t_scope;
 extern int count;
 extern void displaySymTable();
+extern void update(char* name, int value);
 
 %}
 
@@ -84,8 +88,11 @@ COND
 
 ASSIGN_EXPR
       : ID T_eq ARITH_EXPR
-      | TYPE ID T_eq ARITH_EXPR
+      | TYPE ID T_eq ARITH_EXPR {printf("symbol:%s\n", $2);
+      update($2, atoi($4));
+    }
       ;
+
 
 ARITH_EXPR
       : LIT

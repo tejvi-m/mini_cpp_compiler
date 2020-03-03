@@ -2,7 +2,10 @@
     #include <stdio.h>
     #include <stdlib.h>
     #include <string.h>
+    #define YYSTYPE char *
     #include "y.tab.h"
+    extern YYSTYPE yylval;
+
     typedef struct node{
         int scope;
         int value;
@@ -22,6 +25,7 @@
     char tdType[50];
     void insert(node* head, int* idx, int scope, char* dtype, char* val, int line_num);
     void displaySymTable();
+    void update(char* name, int value);
 %}
 
 
@@ -53,6 +57,7 @@ break {printf("%d\t%s\tKEYW\n", yylineno, yytext); return BREAK;}
 continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
 
 {alphabet}({alphabet}|{digit})* {
+                                yylval = strdup(yytext);
                                 if(dflag)
                                     insert(symTable, &count, t_scope, tdType, yytext, yylineno);printf("%d\t%s\tIDENTIFIER\n", yylineno, yytext);
                                 dflag = 0;
@@ -78,7 +83,7 @@ continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
 \} {t_scope--;printf("%d\t%s\tCLOSE BRACES\n", yylineno, yytext); return CBR;}
 
 
-{digit}+ {printf("%d\t%s\tINTEGER\n", yylineno, yytext); return NUM;}
+{digit}+ {printf("%d\t%s\tINTEGER\n", yylineno, yytext); yylval = strdup(yytext); return NUM;}
 {digit}+\.{digit}+(E(\+|\-)?{digit}+)? {printf("%d\t%s\tFLOATING POINT NUMBER\n", yylineno, yytext); return FLT;}
 
 \".*\" {printf("%d\t%s\tSTRING CONSTANT\n", yylineno, yytext); return STRING;}
@@ -159,6 +164,15 @@ void displaySymTable()
                 printf("At line number %d\t", symTable[i].line_num);
                 printf("data type is %s\n", symTable[i].dtype); */
         }
+}
+
+void update(char* name, int value){
+  for(int i = 0; i < count; i++)
+  {
+    if(!strcmp(symTable[i].name, name)){
+        symTable[i].value = value;
+    }
+  }
 }
 
 int yywrap(){
