@@ -28,7 +28,10 @@
     void displaySymTable();
     int find(int  t_scope, char *name);
     void update(char* name, int value, int scope);
+    void incrScope();
+    void decrScope(int scope);
 %}
+
 
 
 alphabet [a-zA-z_]
@@ -45,8 +48,8 @@ int {printf("%d\t%s\tTYPE\n", yylineno, yytext);  dflag = 1; strcpy(tdType, yyte
 float {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yytext); yylval = strdup(yytext); return FLOAT;}
 char {printf("%d\t%s\tTYPE\n", yylineno, yytext); dflag = 1; strcpy(tdType, yytext); yylval = strdup(yytext); return CHAR;}
 "main()" {printf("%d\t%s\tKEYW\n", yylineno, yytext); dflag = 0; return MAINTOK;}
-for {printf("%d\t%s\tKEYW\n", yylineno, yytext); flag = 1; t_scope++; return FOR;}
-while {printf("%d\t%s\tKEYW\n", yylineno, yytext); flag = 1; t_scope++; return WHILE;}
+for {printf("%d\t%s\tKEYW\n", yylineno, yytext); flag = 1; t_scope++; incrScope(); return FOR;}
+while {printf("%d\t%s\tKEYW\n", yylineno, yytext); flag = 1; t_scope++; incrScope(); return WHILE;}
 
 return {printf("%d\t%s\tKEYW\n", yylineno, yytext); return RETURN;}
 if {printf("%d\t%s\tKEYW\n", yylineno, yytext); return IF;}
@@ -77,10 +80,11 @@ continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
 
 
 \{ {if(!flag){
+    incrScope();
 		t_scope++;
 	}
 	printf("%d\t%s\tOPEN BRACES\n", yylineno, yytext); return OBR;}
-\} {t_scope--; decrScope(); printf("%d\t%s\tCLOSE BRACES\n", yylineno, yytext); return CBR;}
+\} {t_scope--; decrScope(t_scope); printf("%d\t%s\tCLOSE BRACES\n", yylineno, yytext); return CBR;}
 
 
 {digit}+ {printf("%d\t%s\tINTEGER\n", yylineno, yytext); yylval = strdup(yytext); return NUM;}
@@ -105,7 +109,7 @@ continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
 ! {printf("%d\t%s\tLOGICAL OPERATORS\n", yylineno, yytext); return T_neq;}
 
 = {printf("%d\t%s\tASSIGNMENT\n", yylineno, yytext); return T_eq;}
-";" {printf("%d\t%s\tTERMINATOR\n", yylineno, yytext); dflag = 0; return TERMINATOR;}
+";" {printf("%d\t%s\tTERMINATOR\n", yylineno, yytext); dflag = 0; flag = 0;return TERMINATOR;}
 "," {printf("%d\t%s\tCOMMA\n", yylineno, yytext); return COMMA;}
 \t ;
 
@@ -123,7 +127,7 @@ int insert(int* idx, int scope, char* dtype, char* name, int line_num){
     int present = 0;
 
     for(int i = 0; i < *idx; i++){
-            if(!strcmp(symTable[i].name, name) && symTable[i].scope == scope){
+            if(!strcmp(symTable[i].name, name) && symTable[i].scope == scope && !symTable[0].valid){
                 present = 1;
                 break;
             }
@@ -147,14 +151,10 @@ int insert(int* idx, int scope, char* dtype, char* name, int line_num){
 void displaySymTable()
 {
         printf("printing symbol table: \n");
-        printf("Token\t\tData type\tScope\t\tValue\t\tLine number\n");
+        printf("Token\t\tData type\tScope\t\tValue\t\tLine number\t\tValidity\n");
         for(int i = 0; i < count; i++)
         {
-                printf("%s\t\t%s\t\t%d\t\t%d\t\t%d\n", symTable[i].name, symTable[i].dtype, symTable[i].scope, symTable[i].value, symTable[i].line_num );
-                /* printf("Scope %d\t",symTable[i].scope);
-                printf("Token is %s\t", symTable[i].name);
-                printf("At line number %d\t", symTable[i].line_num);
-                printf("data type is %s\n", symTable[i].dtype); */
+                printf("%s\t\t%s\t\t%d\t\t%d\t\t%d\t\t%d\n", symTable[i].name, symTable[i].dtype, symTable[i].scope, symTable[i].value, symTable[i].line_num, symTable[i].valid );
         }
 }
 
@@ -179,13 +179,27 @@ int find(int  scope, char *name){
     return present;
   }
 
-void decrScope(){
+
+void incrScope(){
+    for(int i = 0; i < count; i++)
+    {
+      if(symTable[i].valid) symTable[i].valid += 1;
+    }
+}
+
+void decrScope(int scope){
   for(int i = 0; i < count; i++)
   {
-    --symTable[i].valid;
+    if(symTable[i].valid != 0)
+    {
+      symTable[i].valid -= 1;
+      if(symTable[i].valid < symTable[i].scope){
+          symTable[i].valid = 0;
+        }
+    }
   }
-
 }
+
 int yywrap(){
     return 1;
 }

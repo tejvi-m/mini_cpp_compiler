@@ -18,6 +18,7 @@ extern void displaySymTable();
 extern int find(int  t_scope, char *yytext);
 extern void update(char* name, int value, int scope);
 extern int insert(int* idx, int scope, char* dtype, char* val, int line_num);
+extern void decrScope();
 
 %}
 
@@ -54,6 +55,7 @@ C
       | statement TERMINATOR
       | LOOPS
       | C OBR C CBR
+      | OBR CBR
       | error TERMINATOR
       ;
 
@@ -100,13 +102,13 @@ ASSIGN_EXPR
         if (!find(t_scope, $1)) {
           yyerror("variable not declared");
         }
-
       update($1, atoi($3), t_scope);
     }
 
       | TYPE ID T_eq ARITH_EXPR {
         if(!insert(&count, t_scope, $1, $2, yylineno))
               yyerror("Variable redeclared");
+
         update($2, atoi($4), t_scope);
       }
 
