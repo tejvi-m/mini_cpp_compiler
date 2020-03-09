@@ -12,6 +12,7 @@
         char name[100];
         char dtype[50];
         int line_num;
+        int valid;
     }node;
 
     typedef struct table{
@@ -79,7 +80,7 @@ continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
 		t_scope++;
 	}
 	printf("%d\t%s\tOPEN BRACES\n", yylineno, yytext); return OBR;}
-\} {t_scope--;printf("%d\t%s\tCLOSE BRACES\n", yylineno, yytext); return CBR;}
+\} {t_scope--; decrScope(); printf("%d\t%s\tCLOSE BRACES\n", yylineno, yytext); return CBR;}
 
 
 {digit}+ {printf("%d\t%s\tINTEGER\n", yylineno, yytext); yylval = strdup(yytext); return NUM;}
@@ -120,7 +121,7 @@ continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
 
 int insert(int* idx, int scope, char* dtype, char* name, int line_num){
     int present = 0;
-    
+
     for(int i = 0; i < *idx; i++){
             if(!strcmp(symTable[i].name, name) && symTable[i].scope == scope){
                 present = 1;
@@ -134,6 +135,7 @@ int insert(int* idx, int scope, char* dtype, char* name, int line_num){
         symTable[*idx].value = 0;
         strcpy(symTable[*idx].name, name);
         strcpy(symTable[*idx].dtype, dtype);
+        symTable[*idx].valid = scope;
         *idx = *idx + 1;
 
         return 1;
@@ -159,7 +161,7 @@ void displaySymTable()
 void update(char* name, int value, int scope){
   for(int i = 0; i < count; i++)
   {
-    if(!strcmp(symTable[i].name, name) && symTable[i].scope == scope){
+    if(!strcmp(symTable[i].name, name) && symTable[i].scope == scope && symTable[i].valid){
         symTable[i].value = value;
     }
   }
@@ -169,13 +171,21 @@ int find(int  scope, char *name){
   int present = 0;
   for(int i = 0; i < count; i++)
   {
-    if(!strcmp(symTable[i].name, name) && symTable[i].scope <= scope){
+    if(!strcmp(symTable[i].name, name) && symTable[i].scope <= scope && symTable[i].valid){
         present = 1;
         break;
     }
   }
     return present;
   }
+
+void decrScope(){
+  for(int i = 0; i < count; i++)
+  {
+    --symTable[i].valid;
+  }
+
+}
 int yywrap(){
     return 1;
 }

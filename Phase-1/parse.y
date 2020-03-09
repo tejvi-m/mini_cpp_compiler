@@ -17,7 +17,7 @@ extern int count;
 extern void displaySymTable();
 extern int find(int  t_scope, char *yytext);
 extern void update(char* name, int value, int scope);
-extern     int insert(int* idx, int scope, char* dtype, char* val, int line_num);
+extern int insert(int* idx, int scope, char* dtype, char* val, int line_num);
 
 %}
 
