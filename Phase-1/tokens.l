@@ -29,7 +29,7 @@
     int find(int  t_scope, char *name);
     void update(char* name, int value, int scope);
     void incrScope();
-    void decrScope(int scope);
+    void decrScope();
 %}
 
 
@@ -151,10 +151,10 @@ int insert(int* idx, int scope, char* dtype, char* name, int line_num){
 void displaySymTable()
 {
         printf("printing symbol table: \n");
-        printf("Token\t\tData type\tScope\t\tValue\t\tLine number\t\tValidity\n");
+        printf("Token\t\tData type\tScope\t\tValue\t\tLine number\n");
         for(int i = 0; i < count; i++)
         {
-                printf("%s\t\t%s\t\t%d\t\t%d\t\t%d\t\t%d\n", symTable[i].name, symTable[i].dtype, symTable[i].scope, symTable[i].value, symTable[i].line_num, symTable[i].valid );
+                printf("%s\t\t%s\t\t%d\t\t%d\t\t%d\n", symTable[i].name, symTable[i].dtype, symTable[i].scope, symTable[i].value, symTable[i].line_num);
         }
 }
 
@@ -187,7 +187,7 @@ void incrScope(){
     }
 }
 
-void decrScope(int scope){
+void decrScope(){
   for(int i = 0; i < count; i++)
   {
     if(symTable[i].valid != 0)
