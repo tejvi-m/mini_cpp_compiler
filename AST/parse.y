@@ -88,7 +88,7 @@ LOOPS
       }
       | FOR OB ASSIGN_EXPR TERMINATOR COND TERMINATOR statement CB LOOPBODY
       | IF OB COND CB LOOPBODY {
-        $$ = addToTree("if", $3, $5, NULL, 0);
+         $$ = addToTree("if", $3, $5, NULL, 0);
       }
       | IF OB COND CB LOOPBODY ELSE LOOPBODY{
             astnode* elsePart = addToTree("else", $7, NULL, NULL, 0);
@@ -215,7 +215,7 @@ PRINT
       ;
 LIT
       : ID {
-        $$=addToTree((char*) $1, NULL, NULL, NULL, 0);
+            $$=addToTree((char*) $1, NULL, NULL, NULL, 0);
         }
       | NUM {
         $$=addToTree((char*) $1, NULL, NULL, NULL, 0);
@@ -269,7 +269,7 @@ astnode* addToTree(char *op,astnode *left,astnode *right, astnode** siblings, in
   char *newstr = (char *) malloc(strlen(op)+1);
   strcpy(newstr,op);
   new->name=newstr;
-  new->children = (astnode**) malloc(sizeof(astnode*) * 3);
+  new->children = (astnode**) malloc(sizeof(astnode*) * (lenSiblings + 2));
   new->children[0] = left;
   new->children[1] = right;
   new->numChildren = lenSiblings + 2;
