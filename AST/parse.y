@@ -90,7 +90,7 @@ LOOPS
       | IF OB COND CB LOOPBODY ELSE LOOPBODY{
             astnode* elsePart = addToTree("else", $7, NULL, NULL);
             astnode* ifPart = addToTree("if", $5, NULL, NULL);
-            
+
             $$ = addToTree("condition", $3, elsePart, ifPart);
       }
       ;
@@ -189,7 +189,10 @@ TERNARY_EXPR
 
 
 PRINT
-      : COUT T_lt T_lt STRING
+      : COUT T_lt T_lt STRING {
+        astnode* x = addToTree((char *) $4, NULL, NULL, NULL);
+        $$ = addToTree((char *) $1, x, NULL, NULL);
+      }
       | COUT T_lt T_lt STRING T_lt T_lt ENDL
       | COUT T_lt T_lt ENDL
 
@@ -247,12 +250,11 @@ astnode* addToTree(char *op,astnode *left,astnode *right, astnode* condition)
   astnode* new = (astnode*) malloc(sizeof(astnode));
   char *newstr = (char *) malloc(strlen(op)+1);
   strcpy(newstr,op);
-  new->name=newstr;  
-  new->children = (astnode**) malloc(sizeof(astnode*) * 3); 
+  new->name=newstr;
+  new->children = (astnode**) malloc(sizeof(astnode*) * 3);
   new->children[0] = left;
   new->children[1] = right;
-  new->children[2] = condition; 
-  
+  new->children[2] = condition;
 //   astnode *new = (astnode*) malloc(sizeof(astnode));
 // 	char *newstr = (char *) malloc(strlen(op)+1);
 //   strcpy(newstr,op);
@@ -265,6 +267,7 @@ astnode* addToTree(char *op,astnode *left,astnode *right, astnode* condition)
 void printTree(astnode *tree)
 {
   if(tree){
+
     if(tree->children[0] || tree->children[1])
     printf("(");
     printf(" %s ",tree->name);

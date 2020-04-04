@@ -44,7 +44,7 @@ if {printf("%d\t%s\tKEYW\n", yylineno, yytext); return IF;}
 else {printf("%d\t%s\tKEYW\n", yylineno, yytext); return ELSE;}
 
 
-cout {printf("%d\t%s\tKEYW\n", yylineno, yytext); return COUT;}
+cout {printf("%d\t%s\tKEYW\n", yylineno, yytext);yylval = strdup(yytext); return COUT;}
 endl {printf("%d\t%s\tKEYW\n", yylineno, yytext); return ENDL;}
 break {printf("%d\t%s\tKEYW\n", yylineno, yytext); return BREAK;}
 continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
@@ -100,7 +100,7 @@ continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
 
 " " ;
 
-\"(\\.|[^"\\])*\" {printf("%d\t%s\tSTRING CONSTANT\n", yylineno, yytext); return STRING;}
+\"(\\.|[^"\\])*\" {printf("%d\t%s\tSTRING CONSTANT\n", yylineno, yytext); yylval = strdup(yytext); return STRING;}
 
 
 . {printf("%d\t%s\ERROR\n", yylineno, yytext);}
