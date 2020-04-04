@@ -16,7 +16,7 @@ extern YYSTYPE yylval;
 
 int valid = 1;
 
-astnode* addToTree(char *op,astnode *left,astnode *right, astnode* condition);
+astnode* addToTree(char *op,astnode *left,astnode *right, astnode** siblings, int lenSiblings);
 void printTree(astnode *tree);
 
 extern int yylineno;
@@ -81,17 +81,20 @@ C
 
 LOOPS
       : WHILE OB COND CB LOOPBODY {
-        $$ = addToTree("while", $3, $5, NULL);
+        $$ = addToTree("while", $3, $5, NULL, 0);
       }
       | FOR OB ASSIGN_EXPR TERMINATOR COND TERMINATOR statement CB LOOPBODY
       | IF OB COND CB LOOPBODY {
-        $$ = addToTree("if", $3, $5, NULL);
+        $$ = addToTree("if", $3, $5, NULL, 0);
       }
       | IF OB COND CB LOOPBODY ELSE LOOPBODY{
-            astnode* elsePart = addToTree("else", $7, NULL, NULL);
-            astnode* ifPart = addToTree("if", $5, NULL, NULL);
-
-            $$ = addToTree("condition", $3, elsePart, ifPart);
+            astnode* elsePart = addToTree("else", $7, NULL, NULL, 0);
+            astnode* ifPart = addToTree("if", $5, NULL, NULL, 0);
+            astnode** siblings = (astnode**) malloc(sizeof(astnode*) * 1);
+            siblings[0] = elsePart;
+            // siblings[1] = elsePart;
+            // siblings[2] = elsePart;
+            $$ = addToTree("condition", $3, ifPart, siblings, 1);
       }
       ;
 
@@ -118,7 +121,7 @@ statement
 
 
 COND
-      : LIT RELOP LIT {$$=addToTree((char *)$2,$1,$3, NULL);}
+      : LIT RELOP LIT {$$=addToTree((char *)$2,$1,$3, NULL, 0);}
       | LIT {$$=$1;}
       | LIT RELOP LIT bin_boolop LIT RELOP LIT
       | un_boolop OB LIT RELOP LIT CB
@@ -132,13 +135,13 @@ COND
 ASSIGN_EXPR
       : ID T_eq ARITH_EXPR
       {
-        astnode* newnode =addToTree((char*) $1, NULL, NULL, NULL);
-        $$=addToTree("=", newnode, $3, NULL);
+        astnode* newnode =addToTree((char*) $1, NULL, NULL, NULL, 0);
+        $$=addToTree("=", newnode, $3, NULL, 0);
       }
       | TYPE ID T_eq ARITH_EXPR
       {
-        astnode* newnode =addToTree((char*) $2, NULL, NULL, NULL);
-        $$ = addToTree("=", newnode , $4, NULL);
+        astnode* newnode =addToTree((char*) $2, NULL, NULL, NULL, 0);
+        $$ = addToTree("=", newnode , $4, NULL, 0);
       }
 
     |
@@ -172,10 +175,10 @@ X : ID COMMA X {
 ARITH_EXPR
       : LIT
       | LIT bin_arop ARITH_EXPR {
-        $$=addToTree((char *) $2, $1, $3, NULL);
+        $$=addToTree((char *) $2, $1, $3, NULL, 0);
       }
       | LIT bin_boolop ARITH_EXPR {
-        $$=addToTree((char *) $2, $1, $3, NULL);
+        $$=addToTree((char *) $2, $1, $3, NULL, 0);
       }
       | LIT un_arop
       | un_arop ARITH_EXPR
@@ -190,27 +193,27 @@ TERNARY_EXPR
 
 PRINT
       : COUT T_lt T_lt STRING {
-        astnode* x = addToTree((char *) $4, NULL, NULL, NULL);
-        $$ = addToTree((char *) $1, x, NULL, NULL);
+        astnode* x = addToTree((char *) $4, NULL, NULL, NULL, 0);
+        $$ = addToTree((char *) $1, x, NULL, NULL, 0);
       }
       | COUT T_lt T_lt STRING T_lt T_lt ENDL {
         {
-          astnode* x = addToTree((char *) $4, NULL, NULL, NULL);
-          $$ = addToTree((char *) $1, x, NULL, NULL);
+          astnode* x = addToTree((char *) $4, NULL, NULL, NULL, 0);
+          $$ = addToTree((char *) $1, x, NULL, NULL, 0);
         }
       }
       | COUT T_lt T_lt ENDL{
-        astnode* x = addToTree("", NULL, NULL, NULL);
-        $$ = addToTree((char *) $1, x, NULL, NULL);
+        astnode* x = addToTree("", NULL, NULL, NULL, 0);
+        $$ = addToTree((char *) $1, x, NULL, NULL, 0);
       }
 
       ;
 LIT
       : ID {
-        $$=addToTree((char*) $1, NULL, NULL, NULL);
+        $$=addToTree((char*) $1, NULL, NULL, NULL, 0);
         }
       | NUM {
-        $$=addToTree((char*) $1, NULL, NULL, NULL);
+        $$=addToTree((char*) $1, NULL, NULL, NULL, 0);
       }
       ;
 TYPE
@@ -253,16 +256,23 @@ un_boolop
 
 #include <ctype.h>
 
-astnode* addToTree(char *op,astnode *left,astnode *right, astnode* condition)
+astnode* addToTree(char *op,astnode *left,astnode *right, astnode** siblings, int lenSiblings)
 {
   astnode* new = (astnode*) malloc(sizeof(astnode));
   char *newstr = (char *) malloc(strlen(op)+1);
   strcpy(newstr,op);
   new->name=newstr;
-  new->children = (astnode**) malloc(sizeof(astnode*) * 3);
+  new->children = (astnode**) malloc(sizeof(astnode*) * (lenSiblings + 2)); 
   new->children[0] = left;
   new->children[1] = right;
-  new->children[2] = condition;
+  
+  if(siblings){
+        for(int i = 0; i < lenSiblings; i++){
+              new->children[i + 2] = siblings[i];
+        }
+  }
+//   new->children[2] = condition; 
+  
 //   astnode *new = (astnode*) malloc(sizeof(astnode));
 // 	char *newstr = (char *) malloc(strlen(op)+1);
 //   strcpy(newstr,op);
@@ -286,6 +296,8 @@ void printTree(astnode *tree)
     //optional child printinf
     if(tree->children[2])
     printTree(tree->children[2]);
+//     if(tree->children[3])
+//     printTree(tree->children[3]);
     if(tree->children[0] || tree->children[1])
     printf(")");
   }
