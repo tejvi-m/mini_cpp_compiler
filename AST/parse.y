@@ -111,7 +111,8 @@ ASSIGN_EXPR
       }
       | TYPE ID T_eq ARITH_EXPR
       {
-        $$ = addToTree("=",$2 , $4);
+        astnode* newnode =addToTree((char*) $2, NULL, NULL);
+        $$ = addToTree("=", newnode , $4);
       }
 
     |
@@ -167,7 +168,7 @@ PRINT
       ;
 LIT
       : ID {
-        $$=addToTree("i", NULL, NULL);
+        $$=addToTree((char*) $1, NULL, NULL);
         }
       | NUM {
         $$=addToTree((char*) $1, NULL, NULL);

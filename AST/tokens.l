@@ -48,10 +48,7 @@ continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
 {alphabet}({alphabet}|{digit})* {
 
                                 printf("%d\t%s\tID\n", yylineno, yytext);
-                                yylval  = (astnode *) malloc(sizeof(astnode));
-                                strcpy(yylval->name, yytext);
-                                yylval -> right = NULL;
-                                yylval -> left = NULL;
+                                yylval = strdup(yytext);
                                 return ID;}
 
 "#include"  {printf("%d\t%s\tKEYW\n", yylineno, yytext); return INCLUDE;}
@@ -75,7 +72,7 @@ continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
 {digit}+\.{digit}+(E(\+|\-)?{digit}+)? {printf("%d\t%s\tFLOATING POINT NUMBER\n", yylineno, yytext); return FLT;}
 
 \".*\" {printf("%d\t%s\tSTRING CONSTANT\n", yylineno, yytext);  yylval = strdup(yytext); return STRING;}
-"==" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext);  yylval = strdup(yytext);  return T_eqeq;}
+"==" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext); return T_eqeq;}
 "!=" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext);  return T_neq;}
 ">=" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext);  yylval = strdup(yytext); return T_gteq;}
 "<=" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext);  return T_lteq;}
@@ -84,12 +81,12 @@ continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
 \+\+ {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext);  return T_incr;}
 -- {printf("%d\t%s\tUNARY OPERATORS\n", yylineno, yytext); yylval = strdup(yytext);  return T_decr;}
 
-"+" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext);  yylval = strdup(yytext); return T_pl;}
+\+ {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext); return T_pl;}
 \- {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext);  return T_min;}
 \/ {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext);  return T_div;}
-\* {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext);  yylval = strdup(yytext); return T_mul;}
-&& {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext);  yylval = strdup(yytext); return T_and;}
-\|\| {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext);  yylval = strdup(yytext); return T_or;}
+\* {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext); return T_mul;}
+&& {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext); return T_and;}
+\|\| {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext); return T_or;}
 ! {printf("%d\t%s\tLOGICAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext);  return T_neq;}
 
 = {printf("%d\t%s\tASSIGNMENT\n", yylineno, yytext); yylval = strdup(yytext);  return T_eq;}
