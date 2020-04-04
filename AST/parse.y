@@ -40,11 +40,16 @@ START
 
 MAIN
       : VOID MAINTOK BODY
-      | INT MAINTOK BODY
+      | INT MAINTOK BODY{
+        astnode* masternode = addToTree("main", $3, NULL, NULL, 0);
+        printTree(masternode);
+      }
       ;
 
 BODY
-      : OBR C CBR
+      : OBR C CBR{
+        $$ = $2;
+      }
       ;
 
 // extensively responsible for printing the nodes, and also adding the nodes, loop and statement, of similar scope together, in a binary tree fashion.
