@@ -6,8 +6,7 @@
 
 typedef struct astnode{
   char *name;
-//   struct astnode* left;
-//   struct astnode* right;
+  int numChildren;
   struct astnode** children;
 }astnode;
 
@@ -15,8 +14,8 @@ typedef struct astnode{
 extern YYSTYPE yylval;
 
 int valid = 1;
-
-astnode* addToTree(char *op,astnode *left,astnode *right, astnode* condition);
+int tscope = 0;
+astnode* addToTree(char *op,astnode *left,astnode *right, astnode** siblings, int lenSiblings);
 void printTree(astnode *tree);
 
 extern int yylineno;
@@ -48,24 +47,28 @@ BODY
       : OBR C CBR
       ;
 
-
+// extensively responsible for printing the nodes, and also adding the nodes, loop and statement, of similar scope together, in a binary tree fashion.
 C
       : C statement TERMINATOR {
+        $$ = addToTree("", $1, $2, NULL, 0);
         printTree($2);
         printf("\n");
         printf("----------------------------------------------------------------\n");
       }
       | C LOOPS{
+        $$ = addToTree("", $1, $2, NULL, 0);
         printTree($2);
         printf("\n");
         printf("----------------------------------------------------------------\n");
       }
       | statement TERMINATOR {
+        $$ = addToTree("", $1, NULL, NULL, 0);
         printTree($1);
         printf("\n");
         printf("----------------------------------------------------------------\n");
       }
       | LOOPS{
+        $$ = addToTree("", $1, NULL, NULL, 0);
         printTree($1);
         printf("\n");
         printf("----------------------------------------------------------------\n");
@@ -88,20 +91,25 @@ LOOPS
         $$ = addToTree("if", $3, $5, NULL);
       }
       | IF OB COND CB LOOPBODY ELSE LOOPBODY{
-            astnode* elsePart = addToTree("else", $7, NULL, NULL);
-            astnode* ifPart = addToTree("if", $5, NULL, NULL);
-
-            $$ = addToTree("condition", $3, elsePart, ifPart);
+            astnode* elsePart = addToTree("else", $7, NULL, NULL, 0);
+            astnode* ifPart = addToTree("if", $5, NULL, NULL, 0);
+            astnode** siblings = (astnode**) malloc(sizeof(astnode*) * 2);
+            siblings[0] = elsePart;
+            siblings[1] = elsePart;
+            // siblings[2] = elsePart;
+            $$ = addToTree("condition", $3, ifPart, siblings, 2);
       }
       ;
 
 
 LOOPBODY
 	  : OBR C CBR {
+      // printTree($2);
       $$ = $2;
     }
 	  | TERMINATOR
 	  | statement TERMINATOR {
+      // printTree($1);
       $$ = $1;
     }
     | OBR CBR
@@ -253,7 +261,9 @@ un_boolop
 
 #include <ctype.h>
 
-astnode* addToTree(char *op,astnode *left,astnode *right, astnode* condition)
+// siblings = list of the n sibling nodes, other than the left and right child, to be added to the parent node.
+// will useful in the future i guess
+astnode* addToTree(char *op,astnode *left,astnode *right, astnode** siblings, int lenSiblings)
 {
   astnode* new = (astnode*) malloc(sizeof(astnode));
   char *newstr = (char *) malloc(strlen(op)+1);
@@ -262,16 +272,16 @@ astnode* addToTree(char *op,astnode *left,astnode *right, astnode* condition)
   new->children = (astnode**) malloc(sizeof(astnode*) * 3);
   new->children[0] = left;
   new->children[1] = right;
-  new->children[2] = condition;
-//   astnode *new = (astnode*) malloc(sizeof(astnode));
-// 	char *newstr = (char *) malloc(strlen(op)+1);
-//   strcpy(newstr,op);
-//   new->left=left;
-//   new->right=right;
-//   new->name=newstr;
+  new->numChildren = lenSiblings + 2;
+  if(siblings){
+        for(int i = 0; i < lenSiblings; i++){
+              new->children[i + 2] = siblings[i];
+        }
+  }
   return (new);
 }
 
+// printing the nodes, need to add bfs logic here.
 void printTree(astnode *tree)
 {
   if(tree){
@@ -279,13 +289,12 @@ void printTree(astnode *tree)
     if(tree->children[0] || tree->children[1])
     printf("(");
     printf(" %s ",tree->name);
-    if(tree->children[0])
-    printTree(tree->children[0]);
-    if(tree->children[1])
-    printTree(tree->children[1]);
-    //optional child printinf
-    if(tree->children[2])
-    printTree(tree->children[2]);
+    int i = 0;
+
+    while(i < tree->numChildren){
+          printTree(tree->children[i]);
+          i++;
+    }
     if(tree->children[0] || tree->children[1])
     printf(")");
   }
