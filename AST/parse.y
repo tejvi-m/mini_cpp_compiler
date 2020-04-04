@@ -9,29 +9,16 @@ typedef struct astnode{
   struct astnode* left;
   struct astnode* right;
 }astnode;
+
 #define YYSTYPE struct astnode*
 extern YYSTYPE yylval;
-/* #define YYSTYPE struct astnode* */
+
+int valid = 1;
 
 astnode* addToTree(char *op,astnode *left,astnode *right);
 void printTree(astnode *tree);
 
 extern int yylineno;
-int valid=1;
-int yylex();
-int yyerror(const char *s);
-/* extern int SymTable[100]; */
-extern char tdType[50];
-extern int t_scope;
-extern int dflag;
-extern int count;
-extern void displaySymTable();
-extern int find(int  t_scope, char *yytext);
-extern void update(char* name, int value, int scope);
-extern int insert(int* idx, int scope, char* dtype, char* val, int line_num);
-extern void decrScope();
-
-
 %}
 
 %define parse.error verbose
@@ -41,7 +28,7 @@ extern void decrScope();
 %%
 S
       : START {exit(0);}
-    |error { yyerrok; yyclearin;}
+      |error { yyerrok; yyclearin;}
       ;
 
 START
@@ -62,9 +49,17 @@ BODY
 
 
 C
-      : C statement TERMINATOR {printTree($2);printf("\n");printf("----------------------------------------------------------------\n");}
+      : C statement TERMINATOR {
+        printTree($2);
+        printf("\n");
+        printf("----------------------------------------------------------------\n");
+      }
       | C LOOPS
-      | statement TERMINATOR {printTree($1);printf("\n");printf("----------------------------------------------------------------\n");}
+      | statement TERMINATOR {
+        printTree($1);
+        printf("\n");
+        printf("----------------------------------------------------------------\n");
+      }
       | LOOPS
       | C OBR C CBR
       | OBR CBR
@@ -110,82 +105,48 @@ COND
 
 ASSIGN_EXPR
       : ID T_eq ARITH_EXPR
-      /* { */
-
-        /* if (!find(t_scope, $1)) {
-          yyerror("variable not declared");
-        }
-      update($1, atoi($3), t_scope); */
       {
-        /* printf("try\n %s\n", $1 -> name); */
         astnode* newnode =addToTree((char*) $1, NULL, NULL);
-        $$=addToTree("=", newnode, $3);}
-
-
+        $$=addToTree("=", newnode, $3);
+      }
       | TYPE ID T_eq ARITH_EXPR
-      /* {
-        if(!insert(&count, t_scope, $1, $2, yylineno))
-              yyerror("Variable redeclared");
-
-        update($2, atoi($4), t_scope);
-      } */
-      {$$ = addToTree("=",$2 , $4);}
+      {
+        $$ = addToTree("=",$2 , $4);
+      }
 
     |
       TYPE ID {
 
-        /* if(!insert(&count, t_scope, $1, $2, yylineno))
-              yyerror("Variable redeclared"); */
+
       }
 
       | TYPE ID COMMA X {
-        /* strcpy(tdType, $1);
-        dflag = 1;
-
-        if(!insert(&count, t_scope, $1, $2, yylineno))
-              yyerror("Variable redeclared"); */
             }
       |
       TYPE ID T_eq ARITH_EXPR COMMA X {
-        /* strcpy(tdType, $1);
-        dflag = 1;
-        if(!insert(&count, t_scope, $1, $2, yylineno))
-              yyerror("Variable redeclared");
-        update($2, atoi($4), t_scope); */
+
       }
       ;
 
 X : ID COMMA X {
-  /* if(!insert(&count, t_scope, tdType, $1, yylineno)){
-    printf("redeclared: %s\n", $1);
-    yyerror("Variable redeclared");
-  } */
+
 }
   |
   ID {
-    /* if(!insert(&count, t_scope, tdType, $1, yylineno)){
-      printf("redeclared: %s\n", $1);
-      yyerror("Variable redeclared");
-    } */
+
   }
   | ID T_eq ARITH_EXPR COMMA X {
-    /* if(!insert(&count, t_scope, tdType, $1, yylineno)){
-      printf("redeclared: %s\n", $1);
-      yyerror("Variable redeclared");
-    }
-    update($1, atoi($3), t_scope); */
+
   }
   | ID T_eq ARITH_EXPR {
-    /* if(!insert(&count, t_scope, tdType, $1, yylineno)){
-      printf("redeclared: %s\n", $1);
-      yyerror("Variable redeclared");
-    }
-    update($1, atoi($3), t_scope); */
+
   }
 
 ARITH_EXPR
       : LIT
-      | LIT bin_arop ARITH_EXPR {$$=addToTree((char *) $2, $1, $3);}
+      | LIT bin_arop ARITH_EXPR {
+        $$=addToTree((char *) $2, $1, $3);
+      }
       | LIT bin_boolop ARITH_EXPR
       | LIT un_arop
       | un_arop ARITH_EXPR
@@ -206,12 +167,11 @@ PRINT
       ;
 LIT
       : ID {
-        /* if (!find(t_scope, $1)) {
-            yyerror("variable not declared");
-        } */
-      $$=addToTree("i", NULL, NULL);
+        $$=addToTree("i", NULL, NULL);
+        }
+      | NUM {
+        $$=addToTree((char*) $1, NULL, NULL);
       }
-      | NUM {$$=addToTree((char*) $1, NULL, NULL);}
       ;
 TYPE
       : INT
@@ -256,7 +216,6 @@ un_boolop
 astnode* addToTree(char *op,astnode *left,astnode *right)
 {
   astnode *new = (astnode*) malloc(sizeof(astnode));
-  printf("adding \nop: %s.\n", op);
 	char *newstr = (char *) malloc(strlen(op)+1);
   strcpy(newstr,op);
   new->left=left;
@@ -267,11 +226,9 @@ astnode* addToTree(char *op,astnode *left,astnode *right)
 
 void printTree(astnode *tree)
 {
-  /* printf("i have something to print? \n"); */
-  /* printf("i have something t_\n"); */
 	if(tree->left || tree->right)
 		printf("(");
-	printf(" %s \n",tree->name);
+	printf(" %s ",tree->name);
 	if(tree->left)
 		printTree(tree->left);
 	if(tree->right)
@@ -284,15 +241,12 @@ void printTree(astnode *tree)
 int yyerror(const char *s)
 {
   	extern int yylineno;
-  	valid =0;
+    valid = 0;
   	printf("\n\nERROR: line number: %d - error: %s\n\n",yylineno,s);
-
 }
 
 int main()
 {
-	t_scope=1;
-	count=0;
 	yyparse();
 	if(valid)
   		printf("Parsing successful\n\n\n");
