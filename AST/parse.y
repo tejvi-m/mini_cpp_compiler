@@ -54,30 +54,50 @@ C
         printf("\n");
         printf("----------------------------------------------------------------\n");
       }
-      | C LOOPS
+      | C LOOPS{
+        printTree($2);
+        printf("\n");
+        printf("----------------------------------------------------------------\n");
+      }
       | statement TERMINATOR {
         printTree($1);
         printf("\n");
         printf("----------------------------------------------------------------\n");
       }
-      | LOOPS
-      | C OBR C CBR
+      | LOOPS{
+        printTree($1);
+        printf("\n");
+        printf("----------------------------------------------------------------\n");
+      }
+      | C OBR C CBR{
+        printTree($3);
+        printf("\n");
+        printf("----------------------------------------------------------------\n");
+      }
       | OBR CBR
       | error TERMINATOR
       ;
 
 LOOPS
-      : WHILE OB COND CB LOOPBODY
+      : WHILE OB COND CB LOOPBODY {
+        $$ = addToTree("while", $3, $5);
+      }
       | FOR OB ASSIGN_EXPR TERMINATOR COND TERMINATOR statement CB LOOPBODY
-      | IF OB COND CB LOOPBODY
+      | IF OB COND CB LOOPBODY {
+        $$ = addToTree("if", $3, $5);
+      }
       | IF OB COND CB LOOPBODY ELSE LOOPBODY
       ;
 
 
 LOOPBODY
-	  : OBR C CBR
+	  : OBR C CBR {
+      $$ = $2;
+    }
 	  | TERMINATOR
-	  | statement TERMINATOR
+	  | statement TERMINATOR {
+      $$ = $1;
+    }
     | OBR CBR
 	  ;
 
@@ -148,7 +168,9 @@ ARITH_EXPR
       | LIT bin_arop ARITH_EXPR {
         $$=addToTree((char *) $2, $1, $3);
       }
-      | LIT bin_boolop ARITH_EXPR
+      | LIT bin_boolop ARITH_EXPR {
+        $$=addToTree((char *) $2, $1, $3);
+      }
       | LIT un_arop
       | un_arop ARITH_EXPR
       | un_boolop ARITH_EXPR
@@ -190,7 +212,7 @@ RELOP
 
 
 bin_arop
-      : T_pl {$$=addToTree((char*) $1, NULL, NULL);}
+      : T_pl
       | T_min
       | T_mul
       | T_div
@@ -227,15 +249,17 @@ astnode* addToTree(char *op,astnode *left,astnode *right)
 
 void printTree(astnode *tree)
 {
-	if(tree->left || tree->right)
-		printf("(");
-	printf(" %s ",tree->name);
-	if(tree->left)
-		printTree(tree->left);
-	if(tree->right)
-		printTree(tree->right);
-	if(tree->left || tree->right)
-		printf(")");
+  if(tree){
+    if(tree->left || tree->right)
+    printf("(");
+    printf(" %s ",tree->name);
+    if(tree->left)
+    printTree(tree->left);
+    if(tree->right)
+    printTree(tree->right);
+    if(tree->left || tree->right)
+    printf(")");
+  }
 
 }
 
