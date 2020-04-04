@@ -16,7 +16,7 @@ typedef struct astnode{
 extern YYSTYPE yylval;
 
 int valid = 1;
-
+int tscope = 0;
 astnode* addToTree(char *op,astnode *left,astnode *right, astnode** siblings, int lenSiblings);
 void printTree(astnode *tree);
 
@@ -52,6 +52,7 @@ BODY
 
 C
       : C statement TERMINATOR {
+        $$ = addToTree("", $1, $2, NULL, 0);
         printTree($2);
         printf("\n");
         printf("----------------------------------------------------------------\n");
@@ -62,11 +63,13 @@ C
         printf("----------------------------------------------------------------\n");
       }
       | statement TERMINATOR {
+        $$ = addToTree("", $1, NULL, NULL, 0);
         printTree($1);
         printf("\n");
         printf("----------------------------------------------------------------\n");
       }
       | LOOPS{
+        
         printTree($1);
         printf("\n");
         printf("----------------------------------------------------------------\n");
@@ -102,10 +105,12 @@ LOOPS
 
 LOOPBODY
 	  : OBR C CBR {
+      // printTree($2);
       $$ = $2;
     }
 	  | TERMINATOR
 	  | statement TERMINATOR {
+      // printTree($1);
       $$ = $1;
     }
     | OBR CBR
