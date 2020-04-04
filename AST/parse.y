@@ -8,6 +8,7 @@ typedef struct astnode{
   char *name;
 //   struct astnode* left;
 //   struct astnode* right;
+  int numChildren;
   struct astnode** children;
 }astnode;
 
@@ -90,11 +91,11 @@ LOOPS
       | IF OB COND CB LOOPBODY ELSE LOOPBODY{
             astnode* elsePart = addToTree("else", $7, NULL, NULL, 0);
             astnode* ifPart = addToTree("if", $5, NULL, NULL, 0);
-            astnode** siblings = (astnode**) malloc(sizeof(astnode*) * 1);
+            astnode** siblings = (astnode**) malloc(sizeof(astnode*) * 2);
             siblings[0] = elsePart;
-            // siblings[1] = elsePart;
+            siblings[1] = elsePart;
             // siblings[2] = elsePart;
-            $$ = addToTree("condition", $3, ifPart, siblings, 1);
+            $$ = addToTree("condition", $3, ifPart, siblings, 2);
       }
       ;
 
@@ -265,7 +266,7 @@ astnode* addToTree(char *op,astnode *left,astnode *right, astnode** siblings, in
   new->children = (astnode**) malloc(sizeof(astnode*) * (lenSiblings + 2)); 
   new->children[0] = left;
   new->children[1] = right;
-  
+  new->numChildren = lenSiblings + 2;
   if(siblings){
         for(int i = 0; i < lenSiblings; i++){
               new->children[i + 2] = siblings[i];
@@ -289,15 +290,20 @@ void printTree(astnode *tree)
     if(tree->children[0] || tree->children[1])
     printf("(");
     printf(" %s ",tree->name);
-    if(tree->children[0])
-    printTree(tree->children[0]);
-    if(tree->children[1])
-    printTree(tree->children[1]);
-    //optional child printinf
-    if(tree->children[2])
-    printTree(tree->children[2]);
-//     if(tree->children[3])
-//     printTree(tree->children[3]);
+    int i = 0;
+//     if(tree->children[0])
+//     printTree(tree->children[0]);
+//     if(tree->children[1])
+//     printTree(tree->children[1]);
+//     //optional child printinf
+//     if(tree->children[2])
+//     printTree(tree->children[2]);
+// //     if(tree->children[3])
+// //     printTree(tree->children[3]);
+    while(i < tree->numChildren){
+          printTree(tree->children[i]);
+          i++;
+    }
     if(tree->children[0] || tree->children[1])
     printf(")");
   }
