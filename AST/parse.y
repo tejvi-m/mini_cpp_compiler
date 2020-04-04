@@ -6,8 +6,6 @@
 
 typedef struct astnode{
   char *name;
-//   struct astnode* left;
-//   struct astnode* right;
   int numChildren;
   struct astnode** children;
 }astnode;
@@ -49,7 +47,7 @@ BODY
       : OBR C CBR
       ;
 
-
+// extensively responsible for printing the nodes, and also adding the nodes, loop and statement, of similar scope together
 C
       : C statement TERMINATOR {
         $$ = addToTree("", $1, $2, NULL, 0);
@@ -263,6 +261,8 @@ un_boolop
 
 #include <ctype.h>
 
+// siblings = list of the n sibling nodes, other than the left and right child, to be added to the parent node.
+// will useful in the future i guess
 astnode* addToTree(char *op,astnode *left,astnode *right, astnode** siblings, int lenSiblings)
 {
   astnode* new = (astnode*) malloc(sizeof(astnode));
@@ -278,17 +278,10 @@ astnode* addToTree(char *op,astnode *left,astnode *right, astnode** siblings, in
               new->children[i + 2] = siblings[i];
         }
   }
-//   new->children[2] = condition; 
-  
-//   astnode *new = (astnode*) malloc(sizeof(astnode));
-// 	char *newstr = (char *) malloc(strlen(op)+1);
-//   strcpy(newstr,op);
-//   new->left=left;
-//   new->right=right;
-//   new->name=newstr;
   return (new);
 }
 
+// printing the nodes, need to add bfs logic here.
 void printTree(astnode *tree)
 {
   if(tree){
@@ -297,15 +290,7 @@ void printTree(astnode *tree)
     printf("(");
     printf(" %s ",tree->name);
     int i = 0;
-//     if(tree->children[0])
-//     printTree(tree->children[0]);
-//     if(tree->children[1])
-//     printTree(tree->children[1]);
-//     //optional child printinf
-//     if(tree->children[2])
-//     printTree(tree->children[2]);
-// //     if(tree->children[3])
-// //     printTree(tree->children[3]);
+
     while(i < tree->numChildren){
           printTree(tree->children[i]);
           i++;
