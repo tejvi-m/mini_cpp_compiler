@@ -193,8 +193,16 @@ PRINT
         astnode* x = addToTree((char *) $4, NULL, NULL, NULL);
         $$ = addToTree((char *) $1, x, NULL, NULL);
       }
-      | COUT T_lt T_lt STRING T_lt T_lt ENDL
-      | COUT T_lt T_lt ENDL
+      | COUT T_lt T_lt STRING T_lt T_lt ENDL {
+        {
+          astnode* x = addToTree((char *) $4, NULL, NULL, NULL);
+          $$ = addToTree((char *) $1, x, NULL, NULL);
+        }
+      }
+      | COUT T_lt T_lt ENDL{
+        astnode* x = addToTree("", NULL, NULL, NULL);
+        $$ = addToTree((char *) $1, x, NULL, NULL);
+      }
 
       ;
 LIT
