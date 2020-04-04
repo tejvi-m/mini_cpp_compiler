@@ -8,10 +8,14 @@
 
     #include "y.tab.h"
 
+    // typedef struct astnode{
+    //   char name[100];
+    //   struct astnode* left;
+    //   struct astnode* right;
+    // }astnode;
     typedef struct astnode{
       char name[100];
-      struct astnode* left;
-      struct astnode* right;
+      struct astnode** children;
     }astnode;
 
 %}

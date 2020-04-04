@@ -6,8 +6,9 @@
 
 typedef struct astnode{
   char *name;
-  struct astnode* left;
-  struct astnode* right;
+//   struct astnode* left;
+//   struct astnode* right;
+  struct astnode** children;
 }astnode;
 
 #define YYSTYPE struct astnode*
@@ -15,7 +16,7 @@ extern YYSTYPE yylval;
 
 int valid = 1;
 
-astnode* addToTree(char *op,astnode *left,astnode *right);
+astnode* addToTree(char *op,astnode *left,astnode *right, astnode* condition);
 void printTree(astnode *tree);
 
 extern int yylineno;
@@ -80,13 +81,18 @@ C
 
 LOOPS
       : WHILE OB COND CB LOOPBODY {
-        $$ = addToTree("while", $3, $5);
+        $$ = addToTree("while", $3, $5, NULL);
       }
       | FOR OB ASSIGN_EXPR TERMINATOR COND TERMINATOR statement CB LOOPBODY
       | IF OB COND CB LOOPBODY {
-        $$ = addToTree("if", $3, $5);
+        $$ = addToTree("if", $3, $5, NULL);
       }
-      | IF OB COND CB LOOPBODY ELSE LOOPBODY
+      | IF OB COND CB LOOPBODY ELSE LOOPBODY{
+            astnode* elsePart = addToTree("else", $7, NULL, NULL);
+            astnode* ifPart = addToTree("if", $5, NULL, NULL);
+            
+            $$ = addToTree("condition", $3, elsePart, ifPart);
+      }
       ;
 
 
@@ -112,7 +118,7 @@ statement
 
 
 COND
-      : LIT RELOP LIT {$$=addToTree((char *)$2,$1,$3);}
+      : LIT RELOP LIT {$$=addToTree((char *)$2,$1,$3, NULL);}
       | LIT {$$=$1;}
       | LIT RELOP LIT bin_boolop LIT RELOP LIT
       | un_boolop OB LIT RELOP LIT CB
@@ -126,13 +132,13 @@ COND
 ASSIGN_EXPR
       : ID T_eq ARITH_EXPR
       {
-        astnode* newnode =addToTree((char*) $1, NULL, NULL);
-        $$=addToTree("=", newnode, $3);
+        astnode* newnode =addToTree((char*) $1, NULL, NULL, NULL);
+        $$=addToTree("=", newnode, $3, NULL);
       }
       | TYPE ID T_eq ARITH_EXPR
       {
-        astnode* newnode =addToTree((char*) $2, NULL, NULL);
-        $$ = addToTree("=", newnode , $4);
+        astnode* newnode =addToTree((char*) $2, NULL, NULL, NULL);
+        $$ = addToTree("=", newnode , $4, NULL);
       }
 
     |
@@ -166,10 +172,10 @@ X : ID COMMA X {
 ARITH_EXPR
       : LIT
       | LIT bin_arop ARITH_EXPR {
-        $$=addToTree((char *) $2, $1, $3);
+        $$=addToTree((char *) $2, $1, $3, NULL);
       }
       | LIT bin_boolop ARITH_EXPR {
-        $$=addToTree((char *) $2, $1, $3);
+        $$=addToTree((char *) $2, $1, $3, NULL);
       }
       | LIT un_arop
       | un_arop ARITH_EXPR
@@ -190,10 +196,10 @@ PRINT
       ;
 LIT
       : ID {
-        $$=addToTree((char*) $1, NULL, NULL);
+        $$=addToTree((char*) $1, NULL, NULL, NULL);
         }
       | NUM {
-        $$=addToTree((char*) $1, NULL, NULL);
+        $$=addToTree((char*) $1, NULL, NULL, NULL);
       }
       ;
 TYPE
@@ -236,28 +242,40 @@ un_boolop
 
 #include <ctype.h>
 
-astnode* addToTree(char *op,astnode *left,astnode *right)
+astnode* addToTree(char *op,astnode *left,astnode *right, astnode* condition)
 {
-  astnode *new = (astnode*) malloc(sizeof(astnode));
-	char *newstr = (char *) malloc(strlen(op)+1);
+  astnode* new = (astnode*) malloc(sizeof(astnode));
+  char *newstr = (char *) malloc(strlen(op)+1);
   strcpy(newstr,op);
-  new->left=left;
-  new->right=right;
-  new->name=newstr;
+  new->name=newstr;  
+  new->children = (astnode**) malloc(sizeof(astnode*) * 3); 
+  new->children[0] = left;
+  new->children[1] = right;
+  new->children[2] = condition; 
+  
+//   astnode *new = (astnode*) malloc(sizeof(astnode));
+// 	char *newstr = (char *) malloc(strlen(op)+1);
+//   strcpy(newstr,op);
+//   new->left=left;
+//   new->right=right;
+//   new->name=newstr;
   return (new);
 }
 
 void printTree(astnode *tree)
 {
   if(tree){
-    if(tree->left || tree->right)
+    if(tree->children[0] || tree->children[1])
     printf("(");
     printf(" %s ",tree->name);
-    if(tree->left)
-    printTree(tree->left);
-    if(tree->right)
-    printTree(tree->right);
-    if(tree->left || tree->right)
+    if(tree->children[0])
+    printTree(tree->children[0]);
+    if(tree->children[1])
+    printTree(tree->children[1]);
+    //optional child printinf
+    if(tree->children[2])
+    printTree(tree->children[2]);
+    if(tree->children[0] || tree->children[1])
     printf(")");
   }
 
