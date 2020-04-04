@@ -47,7 +47,7 @@ BODY
       : OBR C CBR
       ;
 
-// extensively responsible for printing the nodes, and also adding the nodes, loop and statement, of similar scope together
+// extensively responsible for printing the nodes, and also adding the nodes, loop and statement, of similar scope together, in a binary tree fashion.
 C
       : C statement TERMINATOR {
         $$ = addToTree("", $1, $2, NULL, 0);
