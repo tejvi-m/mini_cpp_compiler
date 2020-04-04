@@ -103,27 +103,27 @@ continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
 {digit}+ {printf("%d\t%s\tINTEGER\n", yylineno, yytext); yylval = strdup(yytext); return NUM;}
 {digit}+\.{digit}+(E(\+|\-)?{digit}+)? {printf("%d\t%s\tFLOATING POINT NUMBER\n", yylineno, yytext); return FLT;}
 
-\".*\" {printf("%d\t%s\tSTRING CONSTANT\n", yylineno, yytext); return STRING;}
-"==" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_eqeq;}
-"!=" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_neq;}
-">=" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_gteq;}
-"<=" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_lteq;}
-"<" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_lt;}
-">" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_gt;}
-\+\+ {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_incr;}
--- {printf("%d\t%s\tUNARY OPERATORS\n", yylineno, yytext); return T_decr;}
+\".*\" {printf("%d\t%s\tSTRING CONSTANT\n", yylineno, yytext);  yylval = strdup(yytext); return STRING;}
+"==" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext);  yylval = strdup(yytext);  return T_eqeq;}
+"!=" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext);  return T_neq;}
+">=" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext);  yylval = strdup(yytext); return T_gteq;}
+"<=" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext);  return T_lteq;}
+"<" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext);  return T_lt;}
+">" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext);  yylval = strdup(yytext); return T_gt;}
+\+\+ {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext);  return T_incr;}
+-- {printf("%d\t%s\tUNARY OPERATORS\n", yylineno, yytext); yylval = strdup(yytext);  return T_decr;}
 
-\+ {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_pl;}
-\- {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_min;}
-\/ {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_div;}
-\* {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_mul;}
-&& {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_and;}
-\|\| {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_or;}
-! {printf("%d\t%s\tLOGICAL OPERATORS\n", yylineno, yytext); return T_neq;}
+"+" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext);  yylval = strdup(yytext); return T_pl;}
+\- {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext);  return T_min;}
+\/ {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext);  return T_div;}
+\* {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext);  yylval = strdup(yytext); return T_mul;}
+&& {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext);  yylval = strdup(yytext); return T_and;}
+\|\| {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext);  yylval = strdup(yytext); return T_or;}
+! {printf("%d\t%s\tLOGICAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext);  return T_neq;}
 
-= {printf("%d\t%s\tASSIGNMENT\n", yylineno, yytext); return T_eq;}
-";" {printf("%d\t%s\tTERMINATOR\n", yylineno, yytext); dflag = 0; flag = 0;return TERMINATOR;}
-"," {printf("%d\t%s\tCOMMA\n", yylineno, yytext); return COMMA;}
+= {printf("%d\t%s\tASSIGNMENT\n", yylineno, yytext); yylval = strdup(yytext);  return T_eq;}
+";" {printf("%d\t%s\tTERMINATOR\n", yylineno, yytext); dflag = 0; flag = 0; yylval = strdup(yytext); return TERMINATOR;}
+"," {printf("%d\t%s\tCOMMA\n", yylineno, yytext);  yylval = strdup(yytext); return COMMA;}
 \t ;
 
 " " ;
