@@ -311,7 +311,19 @@ X : ID COMMA X {
 
 ARITH_EXPR
       : LIT
-      | LIT bin_arop ARITH_EXPR {
+      | ARITH_EXPR T_pl ARITH_EXPR {
+        $$=addToTree((char *) $2, $1, $3, NULL, 0);
+      }
+      | ARITH_EXPR T_min ARITH_EXPR{
+        $$=addToTree((char *) $2, $1, $3, NULL, 0);
+      }
+      | ARITH_EXPR T_mul ARITH_EXPR{
+        $$=addToTree((char *) $2, $1, $3, NULL, 0);
+      }
+      |ARITH_EXPR T_div ARITH_EXPR{
+        $$=addToTree((char *) $2, $1, $3, NULL, 0);
+      }
+      | LIT bin_arop LIT{
         $$=addToTree((char *) $2, $1, $3, NULL, 0);
       }
       | LIT bin_boolop ARITH_EXPR {
