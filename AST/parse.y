@@ -167,30 +167,37 @@ ASSIGN_EXPR
 
     |
       TYPE ID {
-
-
+          astnode* newnode =addToTree((char*) $2, NULL, NULL, NULL, 0);
+          $$= addToTree("init", newnode, NULL, NULL, 0);
       }
 
       | TYPE ID COMMA X {
-            }
+          astnode* newnode =addToTree((char*) $2, NULL, NULL, NULL, 0);
+          $$= addToTree("init", newnode, NULL, NULL, 0);
+        }
       |
       TYPE ID T_eq ARITH_EXPR COMMA X {
-
+        astnode* newnode =addToTree((char*) $2, NULL, NULL, NULL, 0);
+        $$= addToTree("=", newnode, NULL, NULL, 0);
       }
       ;
 
 X : ID COMMA X {
-
+    astnode* newnode =addToTree((char*) $1, NULL, NULL, NULL, 0);
+    $$= addToTree("init", newnode, NULL, NULL, 0);
 }
   |
   ID {
-
+      astnode* newnode =addToTree((char*) $1, NULL, NULL, NULL, 0);
+      $$= addToTree("init", newnode, NULL, NULL, 0);
   }
   | ID T_eq ARITH_EXPR COMMA X {
-
+    astnode* newnode =addToTree((char*) $1, NULL, NULL, NULL, 0);
+      $$= addToTree("=", newnode, $2, NULL, 0);
   }
   | ID T_eq ARITH_EXPR {
-
+    astnode* newnode =addToTree((char*) $1, NULL, NULL, NULL, 0);
+      $$= addToTree("=", newnode, $2, NULL, 0);
   }
 
 ARITH_EXPR
