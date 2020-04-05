@@ -14,11 +14,23 @@ typedef struct astnode{
 extern YYSTYPE yylval;
 
 int valid = 1;
-int tscope = 0;
+
 astnode* addToTree(char *op,astnode *left,astnode *right, astnode** siblings, int lenSiblings);
 void printTree(astnode *tree);
 
+int yyerror(const char *s);
 extern int yylineno;
+
+extern int SymTable[100];
+extern char tdType[50];
+extern int t_scope;
+extern int dflag;
+extern int count;
+extern void displaySymTable();
+extern int find(int  t_scope, char *yytext);
+extern void update(char* name, int value, int scope);
+extern int insert(int* idx, int scope, char* dtype, char* val, int line_num);
+extern void decrScope();
 %}
 
 %define parse.error verbose
@@ -26,9 +38,15 @@ extern int yylineno;
 
 
 %%
-S
-      : START {exit(0);}
-      |error { yyerrok; yyclearin;}
+S: START {
+        printf("Successful parsing.\n");
+        displaySymTable();
+        exit(0);
+      }
+      | error {
+         yyerrok;
+         yyclearin;
+       }
       ;
 
 START
@@ -156,46 +174,94 @@ COND
 ASSIGN_EXPR
       : ID T_eq ARITH_EXPR
       {
+        if (!find(t_scope, $1)) {
+          yyerror("variable not declared");
+        }
+        update($1, atoi($3), t_scope);
+
         astnode* newnode =addToTree((char*) $1, NULL, NULL, NULL, 0);
         $$=addToTree("=", newnode, $3, NULL, 0);
       }
       | TYPE ID T_eq ARITH_EXPR
       {
+        if(!insert(&count, t_scope, $1, $2, yylineno))
+              yyerror("Variable redeclared");
+
+        update($2, atoi($4), t_scope);
+
         astnode* newnode =addToTree((char*) $2, NULL, NULL, NULL, 0);
         $$ = addToTree("=", newnode , $4, NULL, 0);
       }
 
     |
       TYPE ID {
+          if(!insert(&count, t_scope, $1, $2, yylineno))
+                yyerror("Variable redeclared");
+
           astnode* newnode =addToTree((char*) $2, NULL, NULL, NULL, 0);
           $$= addToTree("init", newnode, NULL, NULL, 0);
       }
 
       | TYPE ID COMMA X {
+          strcpy(tdType, $1);
+          dflag = 1;
+
+          if(!insert(&count, t_scope, $1, $2, yylineno))
+                yyerror("Variable redeclared");
+
+
           astnode* newnode =addToTree((char*) $2, NULL, NULL, NULL, 0);
           $$= addToTree("init", newnode, NULL, NULL, 0);
         }
       |
       TYPE ID T_eq ARITH_EXPR COMMA X {
+        strcpy(tdType, $1);
+        dflag = 1;
+        if(!insert(&count, t_scope, $1, $2, yylineno))
+              yyerror("Variable redeclared");
+        update($2, atoi($4), t_scope);
+
         astnode* newnode =addToTree((char*) $2, NULL, NULL, NULL, 0);
         $$= addToTree("=", newnode, NULL, NULL, 0);
       }
       ;
 
 X : ID COMMA X {
+    if(!insert(&count, t_scope, tdType, $1, yylineno)){
+      printf("redeclared: %s\n", $1);
+      yyerror("Variable redeclared");
+    }
+
     astnode* newnode =addToTree((char*) $1, NULL, NULL, NULL, 0);
     $$= addToTree("init", newnode, NULL, NULL, 0);
 }
   |
   ID {
+      if(!insert(&count, t_scope, tdType, $1, yylineno)){
+        printf("redeclared: %s\n", $1);
+        yyerror("Variable redeclared");
+      }
+
       astnode* newnode =addToTree((char*) $1, NULL, NULL, NULL, 0);
       $$= addToTree("init", newnode, NULL, NULL, 0);
   }
   | ID T_eq ARITH_EXPR COMMA X {
+    if(!insert(&count, t_scope, tdType, $1, yylineno)){
+      printf("redeclared: %s\n", $1);
+      yyerror("Variable redeclared");
+    }
+    update($1, atoi($3), t_scope);
+
     astnode* newnode =addToTree((char*) $1, NULL, NULL, NULL, 0);
       $$= addToTree("=", newnode, $2, NULL, 0);
   }
   | ID T_eq ARITH_EXPR {
+    if(!insert(&count, t_scope, tdType, $1, yylineno)){
+      printf("redeclared: %s\n", $1);
+      yyerror("Variable redeclared");
+    }
+    update($1, atoi($3), t_scope);
+
     astnode* newnode =addToTree((char*) $1, NULL, NULL, NULL, 0);
       $$= addToTree("=", newnode, $2, NULL, 0);
   }
@@ -244,6 +310,9 @@ PRINT
       ;
 LIT
       : ID {
+            if (!find(t_scope, $1)) {
+                yyerror("variable not declared");
+            }
             $$=addToTree((char*) $1, NULL, NULL, NULL, 0);
         }
       | NUM {
@@ -346,6 +415,6 @@ int main()
 	{
   		printf("Parsing unsuccessful\n\n\n");
 	}
-	/* displaySymTable(); */
+	displaySymTable();
 	return 0;
 }
