@@ -9,7 +9,11 @@
     #include "y.tab.h"
 
     typedef struct astnode{
-      char name[100];
+      int isID;
+      int scope;
+      int entry;
+      char *name;
+      int numChildren;
       struct astnode** children;
     }astnode;
 
@@ -171,6 +175,7 @@ void displaySymTable()
 }
 
 void update(char* name, int value, int scope){
+  printf("trying to update %s with %d\n", name, value);
   for(int i = 0; i < count; i++)
   {
     if(!strcmp(symTable[i].name, name) && symTable[i].scope == scope && symTable[i].valid){

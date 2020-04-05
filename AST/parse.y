@@ -18,7 +18,7 @@ typedef struct table{
 }table;
 
 typedef struct astnode{
-  int nodeType;
+  int isID;
   int scope;
   int entry;
   char *name;
@@ -39,7 +39,7 @@ void printTree(astnode *tree);
 int yyerror(const char *s);
 extern int yylineno;
 
-extern int SymTable[100];
+extern node symTable[100];
 extern char tdType[50];
 extern int t_scope;
 extern int dflag;
@@ -203,7 +203,7 @@ ASSIGN_EXPR
         update($1, atoi($3), t_scope);
 
         astnode* newnode =addToTree((char*) $1, NULL, NULL, NULL, 0);
-        setScopeAndPtr(newnode, t_scope, id);
+        setScopeAndPtr(newnode, -1, id);
         $$=addToTree("=", newnode, $3, NULL, 0);
       }
       | TYPE ID T_eq ARITH_EXPR
@@ -212,9 +212,10 @@ ASSIGN_EXPR
         if(id == -1)
               yyerror("Variable redeclared");
 
-        update($2, atoi($4), t_scope);
+        update((char *) $2, atoi($4 -> name), t_scope);
 
         astnode* newnode =addToTree((char*) $2, NULL, NULL, NULL, 0);
+        setScopeAndPtr(newnode, t_scope, id);
         $$ = addToTree("=", newnode , $4, NULL, 0);
       }
 
@@ -226,6 +227,7 @@ ASSIGN_EXPR
                 yyerror("Variable redeclared");
 
           astnode* newnode =addToTree((char*) $2, NULL, NULL, NULL, 0);
+          setScopeAndPtr(newnode, t_scope, id);
           $$= addToTree("init", newnode, NULL, NULL, 0);
       }
 
@@ -239,6 +241,7 @@ ASSIGN_EXPR
 
 
           astnode* newnode =addToTree((char*) $2, NULL, NULL, NULL, 0);
+          setScopeAndPtr(newnode, t_scope, id);
           $$= addToTree("init", newnode, NULL, NULL, 0);
         }
       |
@@ -251,6 +254,7 @@ ASSIGN_EXPR
         update($2, atoi($4), t_scope);
 
         astnode* newnode =addToTree((char*) $2, NULL, NULL, NULL, 0);
+        setScopeAndPtr(newnode, t_scope, id);
         $$= addToTree("=", newnode, NULL, NULL, 0);
       }
       ;
@@ -263,6 +267,7 @@ X : ID COMMA X {
     }
 
     astnode* newnode =addToTree((char*) $1, NULL, NULL, NULL, 0);
+    setScopeAndPtr(newnode, t_scope, id);
     $$= addToTree("init", newnode, NULL, NULL, 0);
 }
   |
@@ -274,6 +279,7 @@ X : ID COMMA X {
       }
 
       astnode* newnode =addToTree((char*) $1, NULL, NULL, NULL, 0);
+      setScopeAndPtr(newnode, t_scope, id);
       $$= addToTree("init", newnode, NULL, NULL, 0);
   }
   | ID T_eq ARITH_EXPR COMMA X {
@@ -285,7 +291,8 @@ X : ID COMMA X {
     update($1, atoi($3), t_scope);
 
     astnode* newnode =addToTree((char*) $1, NULL, NULL, NULL, 0);
-      $$= addToTree("=", newnode, $2, NULL, 0);
+    setScopeAndPtr(newnode, t_scope, id);
+    $$= addToTree("=", newnode, $2, NULL, 0);
   }
   | ID T_eq ARITH_EXPR {
     int id = insert(&count, t_scope, tdType, $1, yylineno);
@@ -296,7 +303,8 @@ X : ID COMMA X {
     update($1, atoi($3), t_scope);
 
     astnode* newnode =addToTree((char*) $1, NULL, NULL, NULL, 0);
-      $$= addToTree("=", newnode, $2, NULL, 0);
+    setScopeAndPtr(newnode, t_scope, id);
+    $$= addToTree("=", newnode, $2, NULL, 0);
   }
 
 ARITH_EXPR
@@ -347,7 +355,9 @@ LIT
             if (find == -1) {
                 yyerror("variable not declared");
             }
-            $$=addToTree((char*) $1, NULL, NULL, NULL, 0);
+            astnode* newNode = addToTree((char*) $1, NULL, NULL, NULL, 0);
+            setScopeAndPtr(newNode, -1, id);
+            $$ = newNode;
         }
       | NUM {
         $$=addToTree((char*) $1, NULL, NULL, NULL, 0);
@@ -434,7 +444,8 @@ void printTree(astnode *tree)
 
 void setScopeAndPtr(astnode* node, int scope, int ptr){
   node -> entry = ptr;
-  node -> scope = scope;
+  if(scope >= 0) node -> scope = symTable[ptr].scope;
+  node -> isID = 1;
 
   printf("added id: %s with scope %d and ptr %d\n", node -> name, node -> scope, node -> entry);
 }
