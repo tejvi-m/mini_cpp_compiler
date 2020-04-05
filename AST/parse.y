@@ -203,6 +203,7 @@ ASSIGN_EXPR
         update($1, atoi($3), t_scope);
 
         astnode* newnode =addToTree((char*) $1, NULL, NULL, NULL, 0);
+        setScopeAndPtr(newnode, t_scope, id);
         $$=addToTree("=", newnode, $3, NULL, 0);
       }
       | TYPE ID T_eq ARITH_EXPR
@@ -429,7 +430,13 @@ void printTree(astnode *tree)
     if(tree->children[0] || tree->children[1])
     printf(")");
   }
+}
 
+void setScopeAndPtr(astnode* node, int scope, int ptr){
+  node -> entry = ptr;
+  node -> scope = scope;
+
+  printf("added id: %s with scope %d and ptr %d\n", node -> name, node -> scope, node -> entry);
 }
 
 int yyerror(const char *s)
