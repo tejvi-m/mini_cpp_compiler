@@ -201,9 +201,15 @@ ARITH_EXPR
       | LIT bin_boolop ARITH_EXPR {
         $$=addToTree((char *) $2, $1, $3, NULL, 0);
       }
-      | LIT un_arop
-      | un_arop ARITH_EXPR
-      | un_boolop ARITH_EXPR
+      | LIT un_arop {
+        $$= addToTree((char *) $2, $1, NULL, NULL, 0);
+      }
+      | un_arop ARITH_EXPR{
+        $$= addToTree((char *) $1, $2, NULL, NULL, 0);
+      }
+      | un_boolop ARITH_EXPR{
+        $$= addToTree((char *) $1, $2, NULL, NULL, 0);
+      }
       ;
 
 
