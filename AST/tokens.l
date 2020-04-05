@@ -122,7 +122,7 @@ continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
 \* {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext); return T_mul;}
 && {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext); return T_and;}
 \|\| {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext); return T_or;}
-! {printf("%d\t%s\tLOGICAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext);  return T_neq;}
+! {printf("%d\t%s\tLOGICAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext);  return T_not;}
 
 = {printf("%d\t%s\tASSIGNMENT\n", yylineno, yytext); yylval = strdup(yytext);  return T_eq;}
 ";" {printf("%d\t%s\tTERMINATOR\n", yylineno, yytext); yylval = strdup(yytext);  dflag = 0; flag = 0; return TERMINATOR;}
