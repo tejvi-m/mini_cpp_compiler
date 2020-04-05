@@ -103,7 +103,10 @@ LOOPS
             siblings[1] = elsePart;
             // siblings[2] = elsePart;
             $$ = addToTree("condition", $3, ifPart, siblings, 2);
-      }
+          }
+      | IF OB COND CB LOOPBODY ELSE LOOPS {
+
+        }
       ;
 
 
