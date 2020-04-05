@@ -4,7 +4,23 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef struct node{
+    int scope;
+    int value;
+    char name[100];
+    char dtype[50];
+    int line_num;
+    int valid;
+}node;
+
+typedef struct table{
+    node* head;
+}table;
+
 typedef struct astnode{
+  int nodeType;
+  int scope;
+  int entry;
   char *name;
   int numChildren;
   struct astnode** children;
@@ -15,7 +31,9 @@ extern YYSTYPE yylval;
 
 int valid = 1;
 
-astnode* addToTree(char *op,astnode *left,astnode *right, astnode** siblings, int lenSiblings);
+astnode* addToTree(char *op, astnode *left,astnode *right, astnode** siblings, int lenSiblings);
+void setScopeAndPtr(astnode* node, int scope, int ptr);
+
 void printTree(astnode *tree);
 
 int yyerror(const char *s);
@@ -160,8 +178,12 @@ statement
 
 
 COND
-      : LIT RELOP LIT {$$=addToTree((char *)$2,$1,$3, NULL, 0);}
-      | LIT {$$=$1;}
+      : LIT RELOP LIT {
+        $$=addToTree((char *)$2,$1,$3, NULL, 0);
+      }
+      | LIT {
+        $$=$1;
+      }
       | LIT RELOP LIT bin_boolop LIT RELOP LIT
       | un_boolop OB LIT RELOP LIT CB
       | un_boolop LIT RELOP LIT
@@ -174,7 +196,8 @@ COND
 ASSIGN_EXPR
       : ID T_eq ARITH_EXPR
       {
-        if (!find(t_scope, $1)) {
+        int id = find(t_scope, $1);
+        if (id == -1) {
           yyerror("variable not declared");
         }
         update($1, atoi($3), t_scope);
@@ -184,7 +207,8 @@ ASSIGN_EXPR
       }
       | TYPE ID T_eq ARITH_EXPR
       {
-        if(!insert(&count, t_scope, $1, $2, yylineno))
+        int id = insert(&count, t_scope, $1, $2, yylineno);
+        if(id == -1)
               yyerror("Variable redeclared");
 
         update($2, atoi($4), t_scope);
@@ -195,7 +219,9 @@ ASSIGN_EXPR
 
     |
       TYPE ID {
-          if(!insert(&count, t_scope, $1, $2, yylineno))
+          int id = insert(&count, t_scope, $1, $2, yylineno);
+
+          if(id == -1)
                 yyerror("Variable redeclared");
 
           astnode* newnode =addToTree((char*) $2, NULL, NULL, NULL, 0);
@@ -206,7 +232,8 @@ ASSIGN_EXPR
           strcpy(tdType, $1);
           dflag = 1;
 
-          if(!insert(&count, t_scope, $1, $2, yylineno))
+          int id = insert(&count, t_scope, $1, $2, yylineno);
+          if(id == -1)
                 yyerror("Variable redeclared");
 
 
@@ -217,7 +244,8 @@ ASSIGN_EXPR
       TYPE ID T_eq ARITH_EXPR COMMA X {
         strcpy(tdType, $1);
         dflag = 1;
-        if(!insert(&count, t_scope, $1, $2, yylineno))
+        int id = insert(&count, t_scope, $1, $2, yylineno);
+        if(id == -1)
               yyerror("Variable redeclared");
         update($2, atoi($4), t_scope);
 
@@ -227,7 +255,8 @@ ASSIGN_EXPR
       ;
 
 X : ID COMMA X {
-    if(!insert(&count, t_scope, tdType, $1, yylineno)){
+    int id = insert(&count, t_scope, tdType, $1, yylineno);
+    if(id == -1){
       printf("redeclared: %s\n", $1);
       yyerror("Variable redeclared");
     }
@@ -237,7 +266,8 @@ X : ID COMMA X {
 }
   |
   ID {
-      if(!insert(&count, t_scope, tdType, $1, yylineno)){
+      int id =  insert(&count, t_scope, tdType, $1, yylineno);
+      if(id == -1){
         printf("redeclared: %s\n", $1);
         yyerror("Variable redeclared");
       }
@@ -246,7 +276,8 @@ X : ID COMMA X {
       $$= addToTree("init", newnode, NULL, NULL, 0);
   }
   | ID T_eq ARITH_EXPR COMMA X {
-    if(!insert(&count, t_scope, tdType, $1, yylineno)){
+    int id = insert(&count, t_scope, tdType, $1, yylineno);
+    if(id == -1){
       printf("redeclared: %s\n", $1);
       yyerror("Variable redeclared");
     }
@@ -256,7 +287,8 @@ X : ID COMMA X {
       $$= addToTree("=", newnode, $2, NULL, 0);
   }
   | ID T_eq ARITH_EXPR {
-    if(!insert(&count, t_scope, tdType, $1, yylineno)){
+    int id = insert(&count, t_scope, tdType, $1, yylineno);
+    if(id == -1){
       printf("redeclared: %s\n", $1);
       yyerror("Variable redeclared");
     }
@@ -310,7 +342,8 @@ PRINT
       ;
 LIT
       : ID {
-            if (!find(t_scope, $1)) {
+            int id = find(t_scope, $1);
+            if (find == -1) {
                 yyerror("variable not declared");
             }
             $$=addToTree((char*) $1, NULL, NULL, NULL, 0);

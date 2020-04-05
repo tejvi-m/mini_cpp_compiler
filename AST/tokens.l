@@ -136,6 +136,7 @@ continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
 %%
 int insert(int* idx, int scope, char* dtype, char* name, int line_num){
     int present = 0;
+    int index = -1;
 
     for(int i = 0; i < *idx; i++){
             if(!strcmp(symTable[i].name, name) && symTable[i].scope == scope && !symTable[0].valid){
@@ -153,10 +154,10 @@ int insert(int* idx, int scope, char* dtype, char* name, int line_num){
         symTable[*idx].valid = scope;
         *idx = *idx + 1;
 
-        return 1;
+        return *idx - 1;
     }
 
-    return 0;
+    return -1;
 }
 
 void displaySymTable()
@@ -179,16 +180,15 @@ void update(char* name, int value, int scope){
 }
 
 int find(int  scope, char *name){
-  int present = 0;
+
   for(int i = 0; i < count; i++)
   {
     if(!strcmp(symTable[i].name, name) && symTable[i].scope <= scope && symTable[i].valid){
-        present = 1;
-        break;
+        return i;
     }
   }
-    return present;
-  }
+    return -1;
+}
 
 
 void incrScope(){
