@@ -105,7 +105,13 @@ LOOPS
             $$ = addToTree("condition", $3, ifPart, siblings, 2);
           }
       | IF OB COND CB LOOPBODY ELSE LOOPS {
-
+              astnode* elsePart = addToTree("else", $7, NULL, NULL, 0);
+              astnode* ifPart = addToTree("if", $5, NULL, NULL, 0);
+              astnode** siblings = (astnode**) malloc(sizeof(astnode*) * 2);
+              siblings[0] = elsePart;
+              siblings[1] = elsePart;
+              // siblings[2] = elsePart;
+              $$ = addToTree("condition", $3, ifPart, siblings, 2);
         }
       ;
 
@@ -120,7 +126,9 @@ LOOPBODY
       // printTree($1);
       $$ = $1;
     }
-    | OBR CBR
+    | OBR CBR {
+      $$ = (astnode *) malloc(sizeof(astnode));
+    }
 	  ;
 
 statement
