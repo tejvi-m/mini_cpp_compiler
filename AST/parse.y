@@ -53,8 +53,8 @@ extern void decrScope();
 
 %define parse.error verbose
 %token ID NUM T_lt T_gt COMMA STRC TERMINATOR RETURN FLT T_lteq T_gteq T_neq T_eqeq T_pl T_min T_mul T_div T_and T_or T_incr T_decr T_not T_eq WHILE INT CHAR FLOAT VOID H MAINTOK INCLUDE BREAK CONTINUE IF ELSE COUT STRING FOR OB CB OBR CBR ENDL
-
-
+%left T_pl T_div T_mul T_min T_lteq T_gteq T_lt T_gt T_eqeq T_and T_or
+%right T_eq T_incr T_decr T_not 
 %%
 S: START {
         printf("Successful parsing.\n");
@@ -139,17 +139,17 @@ LOOPS
             astnode** siblings = (astnode**) malloc(sizeof(astnode*) * 1);
             siblings[0] = elsePart;
 
-            $$ = addToTree("condition", $3, ifPart, siblings, 2);
+            $$ = addToTree("condition", $3, ifPart, siblings, 1);
           }
       | IF OB COND CB LOOPBODY ELSE LOOPS {
 
               astnode* elsePart = addToTree("else", $7, NULL, NULL, 0);
               astnode* ifPart = addToTree("if", $5, NULL, NULL, 0);
 
-              astnode** siblings = (astnode**) malloc(sizeof(astnode*) * 2);
+              astnode** siblings = (astnode**) malloc(sizeof(astnode*) * 1);
               siblings[0] = elsePart;
 
-              $$ = addToTree("condition", $3, ifPart, siblings, 2);
+              $$ = addToTree("condition", $3, ifPart, siblings, 1);
         }
       ;
 
