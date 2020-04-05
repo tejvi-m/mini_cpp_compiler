@@ -132,21 +132,23 @@ LOOPS
          $$ = addToTree("if", $3, $5, NULL, 0);
       }
       | IF OB COND CB LOOPBODY ELSE LOOPBODY{
+
             astnode* elsePart = addToTree("else", $7, NULL, NULL, 0);
             astnode* ifPart = addToTree("if", $5, NULL, NULL, 0);
-            astnode** siblings = (astnode**) malloc(sizeof(astnode*) * 2);
+
+            astnode** siblings = (astnode**) malloc(sizeof(astnode*) * 1);
             siblings[0] = elsePart;
-            siblings[1] = elsePart;
-            // siblings[2] = elsePart;
+
             $$ = addToTree("condition", $3, ifPart, siblings, 2);
           }
       | IF OB COND CB LOOPBODY ELSE LOOPS {
+
               astnode* elsePart = addToTree("else", $7, NULL, NULL, 0);
               astnode* ifPart = addToTree("if", $5, NULL, NULL, 0);
+
               astnode** siblings = (astnode**) malloc(sizeof(astnode*) * 2);
               siblings[0] = elsePart;
-              siblings[1] = elsePart;
-              // siblings[2] = elsePart;
+
               $$ = addToTree("condition", $3, ifPart, siblings, 2);
         }
       ;
@@ -200,7 +202,7 @@ ASSIGN_EXPR
         if (id == -1) {
           yyerror("variable not declared");
         }
-        update($1, atoi($3), t_scope);
+        update($1, atoi($3 -> name), t_scope);
 
         astnode* newnode =addToTree((char*) $1, NULL, NULL, NULL, 0);
         setScopeAndPtr(newnode, -1, id);
@@ -251,7 +253,7 @@ ASSIGN_EXPR
         int id = insert(&count, t_scope, $1, $2, yylineno);
         if(id == -1)
               yyerror("Variable redeclared");
-        update($2, atoi($4), t_scope);
+        update($2, atoi($4 -> name), t_scope);
 
         astnode* newnode =addToTree((char*) $2, NULL, NULL, NULL, 0);
         setScopeAndPtr(newnode, t_scope, id);
@@ -288,7 +290,7 @@ X : ID COMMA X {
       printf("redeclared: %s\n", $1);
       yyerror("Variable redeclared");
     }
-    update($1, atoi($3), t_scope);
+    update($1, atoi($3 -> name), t_scope);
 
     astnode* newnode =addToTree((char*) $1, NULL, NULL, NULL, 0);
     setScopeAndPtr(newnode, t_scope, id);
@@ -300,7 +302,7 @@ X : ID COMMA X {
       printf("redeclared: %s\n", $1);
       yyerror("Variable redeclared");
     }
-    update($1, atoi($3), t_scope);
+    update($1, atoi($3 -> name), t_scope);
 
     astnode* newnode =addToTree((char*) $1, NULL, NULL, NULL, 0);
     setScopeAndPtr(newnode, t_scope, id);
