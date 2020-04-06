@@ -108,30 +108,30 @@ BODY
 C
       : C statement TERMINATOR {
         $$ = addToTree("", $1, $2, NULL, 0);
-        printTree($2);
+        // printTree($2);
         printf("\n");
         printf("----------------------------------------------------------------\n");
       }
       | C LOOPS{
         $$ = addToTree("", $1, $2, NULL, 0);
-        printTree($2);
+        // printTree($2);
         printf("\n");
         printf("----------------------------------------------------------------\n");
       }
       | statement TERMINATOR {
         $$ = addToTree("", $1, NULL, NULL, 0);
-        printTree($1);
+        // printTree($1);
         printf("\n");
         printf("----------------------------------------------------------------\n");
       }
       | LOOPS{
         $$ = addToTree("", $1, NULL, NULL, 0);
-        printTree($1);
+        // printTree($1);
         printf("\n");
         printf("----------------------------------------------------------------\n");
       }
       | C OBR C CBR{
-        printTree($3);
+        // printTree($3);
         printf("\n");
         printf("----------------------------------------------------------------\n");
       }
@@ -140,8 +140,9 @@ C
       ;
 
 LOOPS
-      : WHILE OB COND CB LOOPBODY {
-        $$ = addToTree("while", $3, $5, NULL, 0);
+      : WHILE{codegen_while1();} OB COND CB {codegen_while2();} LOOPBODY {
+        $$ = addToTree("while", $4, $7, NULL, 0);
+        codegen_while3();
       }
       | FOR OB ASSIGN_EXPR TERMINATOR COND TERMINATOR statement CB LOOPBODY
       | IF OB COND CB LOOPBODY {
@@ -194,20 +195,21 @@ statement
       | RETURN ARITH_EXPR
       ;
 
-
+//must add the ast logic for other conditional expressions;
 COND
       : LIT RELOP LIT {
+        codegen_bool();
         $$=addToTree((char *)$2,$1,$3, NULL, 0);
       }
       | LIT {
         $$=$1;
       }
       | LIT RELOP LIT bin_boolop LIT RELOP LIT
-      | un_boolop OB LIT RELOP LIT CB
+      | un_boolop OB LIT RELOP LIT{codegen_bool();} CB{codgen_un();}
       | un_boolop LIT RELOP LIT
-      | LIT bin_boolop LIT
-      | un_boolop OB LIT CB
-      | un_boolop LIT
+      | LIT bin_boolop LIT {codegen_bool();}
+      | un_boolop OB LIT CB{codgen_un();}
+      | un_boolop LIT{codgen_un();}
       ;
 
 
@@ -530,7 +532,9 @@ int yyerror(const char *s)
 
 char st[100][20];
 int top = 0;
-
+int lnum = 0;
+int ltop = 0;
+int label[25];
 char i_[3]="00";
 char temp[2]="t";
 
@@ -603,6 +607,40 @@ void codgen_un()
 	}
 }
 
+void codegen_while1(){
+  label[ltop++] = lnum;
+  printf("L%d :", lnum++);
+}
+
+void codegen_while2(){
+  strcpy(temp,"t");
+	strcat(temp,i_);
+
+	printf("%s = not %s\n",temp,st[top - 1]);
+	printf("if %s goto L%d\n",temp,lnum);
+	if(i_[1]!='9')
+		i_[1]++;
+	else
+	{
+		i_[1] = '0';
+		i_[0]++;
+	}
+}
+void codegen_while3(){
+  strcpy(temp,"t");
+	strcat(temp,i_);
+
+	printf("goto L%d\n",label[ltop - 1]);
+	printf("L%d\n",lnum++);
+  ltop = ltop - 1;
+	if(i_[1]!='9')
+		i_[1]++;
+	else
+	{
+		i_[1] = '0';
+		i_[0]++;
+	}
+}
 int main()
 {
 	yyparse();
