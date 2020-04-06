@@ -58,6 +58,7 @@ extern void decrScope();
 %left T_and 
 %left T_neq T_eqeq
 %left T_lteq T_gteq T_lt T_gt 
+
 %left T_pl T_min
 %left T_div T_mul
 %right T_incr T_decr
@@ -92,7 +93,7 @@ MAIN
       : VOID MAINTOK BODY
       | INT MAINTOK BODY{
         astnode* masternode = addToTree("main", $3, NULL, NULL, 0);
-        // printTree(masternode);
+        printTree(masternode);
         // showSt();
       }
       ;
@@ -107,30 +108,30 @@ BODY
 C
       : C statement TERMINATOR {
         $$ = addToTree("", $1, $2, NULL, 0);
-        // printTree($2);
+        printTree($2);
         printf("\n");
         printf("----------------------------------------------------------------\n");
       }
       | C LOOPS{
         $$ = addToTree("", $1, $2, NULL, 0);
-        // printTree($2);
+        printTree($2);
         printf("\n");
         printf("----------------------------------------------------------------\n");
       }
       | statement TERMINATOR {
         $$ = addToTree("", $1, NULL, NULL, 0);
-        // printTree($1);
+        printTree($1);
         printf("\n");
         printf("----------------------------------------------------------------\n");
       }
       | LOOPS{
         $$ = addToTree("", $1, NULL, NULL, 0);
-        // printTree($1);
+        printTree($1);
         printf("\n");
         printf("----------------------------------------------------------------\n");
       }
       | C OBR C CBR{
-        // printTree($3);
+        printTree($3);
         printf("\n");
         printf("----------------------------------------------------------------\n");
       }
@@ -363,12 +364,15 @@ ARITH_EXPR
         codegen_bool();
       }
       | LIT un_arop {
+         codgen_un();
         $$= addToTree((char *) $2, $1, NULL, NULL, 0);
       }
       | un_arop ARITH_EXPR{
+         codgen_un();
         $$= addToTree((char *) $1, $2, NULL, NULL, 0);
       }
       | un_boolop ARITH_EXPR{
+         codgen_un();
         $$= addToTree((char *) $1, $2, NULL, NULL, 0);
       }
       ;
@@ -568,6 +572,29 @@ void codegen()
 	top-=2;
 	strcpy(st[top-1],temp);
 	if(i_[1]!='9')
+		i_[1]++;
+	else
+	{
+		i_[1] = '0';
+		i_[0]++;
+	}
+}
+
+void codgen_un()
+{
+	strcpy(temp,"t");
+	strcat(temp,i_);
+  if(strlen(st[top - 2]) == 2){
+    printf(" %s = %s %c %d\n", temp, st[top-1], st[top-2][0], 1);
+    
+    printf("%s = %s\n", st[top - 1], temp);
+
+  }
+  else
+    printf(" %s = %s%s\n", temp, st[top-2], st[top-1]);
+  top = top - 1;
+  strcpy(st[top - 1], temp);
+  if(i_[1]!='9')
 		i_[1]++;
 	else
 	{
