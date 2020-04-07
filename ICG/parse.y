@@ -326,41 +326,14 @@ X : ID COMMA X {
     setScopeAndPtr(newnode, t_scope, id);
     $$= addToTree("=", newnode, $2, NULL, 0);
   }
-/* 
 
-
-ARITH_EXP
-	  : ADDSUB {$$=$1;}
-	  | EXP T_lt ADDSUB {$$=buildTree("<",$1,$3);}
-	  | EXP T_gt ADDSUB {$$=buildTree(">",$1,$3);}
-	  ;
-	  
-ADDSUB
-      : TERM {$$=$1;}
-      | EXP T_pl TERM {$$=buildTree("+",$1,$3);}
-      | EXP T_min TERM {$$=buildTree("-",$1,$3);}
-      ;
-
-TERM
-	  : FACTOR {$$=$1;}
-      | TERM T_mul FACTOR {$$=buildTree("*",$1,$3);}
-      | TERM T_div FACTOR {$$=buildTree("/",$1,$3);}
-      ;
-      
-FACTOR
-	  : LIT {$$=$1;}
-	  | '(' EXP ')' {$$ = $2;}
-  	  ;
-
-
- */
 ARITH_EXPR
       : LIT
-      | ADDSUB {$$=$1;}
-      /* | LIT bin_arop ARITH_EXPR{
+      // | ADDSUB {$$=$1;}
+      | LIT bin_arop ARITH_EXPR{
         $$=addToTree((char *) $2, $1, $3, NULL, 0);
         codegen_bool();
-      } */
+      }
       | LIT bin_boolop ARITH_EXPR {
         $$=addToTree((char *) $2, $1, $3, NULL, 0);
         codegen_bool();
@@ -379,7 +352,7 @@ ARITH_EXPR
       }
       ;
 
-ADDSUB
+/* ADDSUB
       : TERM {$$=$1;}
       | ARITH_EXPR T_pl TERM { push((char*)$2); $$= addToTree((char *) $2, $1, $3, NULL, 0); codegen();}
       | ARITH_EXPR T_min TERM {push((char*)$2); $$= addToTree((char *) $2, $1, $3, NULL, 0); codegen();}
@@ -394,7 +367,7 @@ TERM
 FACTOR
 	  : LIT {$$=$1;}
 	  | '(' ARITH_EXPR ')' {$$ = $2;}
-  	  ;
+  	  ; */
 
 
 TERNARY_EXPR
