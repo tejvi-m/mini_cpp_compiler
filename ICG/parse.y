@@ -275,6 +275,7 @@ void codegen_bool()
 	}
 }
 
+
 void codegen()
 {
 	strcpy(temp,"t");
@@ -312,6 +313,29 @@ void codgen_un()
 		i_[1] = '0';
 		i_[0]++;
 	}
+}
+
+void codegen_if1(){
+  strcpy(temp,"t");
+	strcat(temp,i_);
+  lnum++;
+	printf("%s = not %s\n",temp,st[top - 1]);
+	printf("if %s goto L%d\n",temp,lnum);
+	if(i_[1]!='9')
+		i_[1]++;
+	else
+	{
+		i_[1] = '0';
+		i_[0]++;
+	}
+  label[++ltop] = lnum;
+}
+
+void codegen_if3(){
+  int y;
+  // printf("$$$$$$$$$$$$$$$$$");
+  y = label[ltop--];
+  printf("L%d: \n", y);
 }
 
 void codegen_while1(){
