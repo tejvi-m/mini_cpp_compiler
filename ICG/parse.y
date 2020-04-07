@@ -17,6 +17,7 @@ extern int yylineno;
 
 %define parse.error verbose
 %token ID NUM T_lt T_gt COMMA STRC TERMINATOR RETURN FLT T_lteq T_gteq T_neq T_eqeq T_pl T_min T_mul T_div T_and T_or T_incr T_decr T_not T_eq WHILE INT CHAR FLOAT VOID H MAINTOK INCLUDE BREAK CONTINUE IF ELSE COUT STRING FOR OB CB OBR CBR ENDL
+
 %right T_eq
 %left T_or
 %left T_and
@@ -27,11 +28,6 @@ extern int yylineno;
 %left T_div T_mul
 %right T_incr T_decr
 %right T_not
-
-
-
-
-
 
 
 %%
@@ -70,28 +66,28 @@ C
       | C LOOPS
       | statement TERMINATOR
       | LOOPS
+      | C SELECTION
+      | SELECTION
       | C OBR C CBR
       | OBR CBR
       | error TERMINATOR
       ;
-
+SELECTION:
+      IF OB COND CB {lab1();} LOOPBODY {lab2();} ElseBody{lab3();}
+      ;
+ElseBody:
+      ELSE LOOPBODY 
+      |%empty
+      ;
 LOOPS
       : WHILE{codegen_while1();} OB COND CB {codegen_while2();} LOOPBODY {
         codegen_while3();
       }
       | FOR OB ASSIGN_EXPR TERMINATOR COND TERMINATOR statement CB LOOPBODY
-      | IF OB COND CB {lab1();} LOOPBODY {lab2();} ELSEBODY {lab3();}
-      /* | IF OB COND CB {lab1();} LOOPBODY {lab2();} ELSE LOOPBODY */
-      ;
-
-ELSEBODY:
-      ELSE LOOPBODY
-      |
       ;
 
 LOOPBODY
-	  : OBR C CBR {
-    }
+	  : OBR C CBR {}
 	  | TERMINATOR
 	  | statement TERMINATOR {
     }
