@@ -80,9 +80,8 @@ LOOPS
         codegen_while3();
       }
       | FOR OB ASSIGN_EXPR TERMINATOR COND TERMINATOR statement CB LOOPBODY
-      | IF OB COND CB LOOPBODY
-      | IF OB COND CB LOOPBODY ELSE LOOPBODY
-      | IF OB COND CB LOOPBODY ELSE LOOPS
+      | IF OB COND CB {lab1();} LOOPBODY {lab2();}
+      /* | IF OB COND CB {lab1();} LOOPBODY {lab2();} ELSE LOOPBODY */
       ;
 
 
@@ -94,6 +93,7 @@ LOOPBODY
     }
     | OBR CBR {
     }
+    | LOOPS
 	  ;
 
 statement
@@ -130,7 +130,7 @@ ASSIGN_EXPR
 
 X : ID COMMA X
   | ID
-  | ID T_eq ARITH_EXPR { push($1); codegen();} COMMA X 
+  | ID T_eq ARITH_EXPR { push($1); codegen();} COMMA X
   | ID T_eq ARITH_EXPR { push($1); codegen();}
   ;
 
@@ -348,6 +348,35 @@ void codegen_while3(){
 		i_[0]++;
 	}
 }
+
+lab1()
+{
+ lnum++;
+ strcpy(temp,"t");
+ strcat(temp,i_);
+ printf("%s = not %s\n",temp,st[top - 1]);
+ printf("if %s goto L%d\n",temp,lnum);
+ i_[0]++;
+ label[++ltop]=lnum;
+}
+
+lab2()
+{
+int x;
+lnum++;
+x=label[ltop--];
+printf("goto L%d\n",lnum);
+printf("L%d: \n",x);
+label[++ltop]=lnum;
+}
+
+lab3()
+{
+int y;
+y=label[ltop--];
+printf("L%d: \n",y);
+}
+
 int main()
 {
 	yyparse();
