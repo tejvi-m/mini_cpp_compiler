@@ -125,17 +125,17 @@ COND
 
 
 ASSIGN_EXPR
-      : ID {push($1);} T_eq ARITH_EXPR {codegen();};
-      | TYPE ID  T_eq ARITH_EXPR { push($2); codegen();}
+      : ID T_eq ARITH_EXPR {push($1);codegen_assign();};
+      | TYPE ID T_eq ARITH_EXPR { push($2); codegen_assign();}
       | TYPE ID
       | TYPE ID COMMA X
-      | TYPE ID T_eq ARITH_EXPR { push($2); codegen();} COMMA X
+      | TYPE ID T_eq ARITH_EXPR { push($2); codegen_assign();} COMMA X
       ;
 
 X : ID COMMA X
   | ID
-  | ID T_eq ARITH_EXPR { push($1); codegen();} COMMA X
-  | ID T_eq ARITH_EXPR { push($1); codegen();}
+  | ID T_eq ARITH_EXPR { push($1); codegen_assign();} COMMA X
+  | ID T_eq ARITH_EXPR { push($1); codegen_assign();}
   ;
 
 ARITH_EXPR
@@ -279,6 +279,7 @@ void codegen_bool()
 	}
 }
 
+
 void codegen()
 {
 	strcpy(temp,"t");
@@ -318,6 +319,11 @@ void codgen_un()
 	}
 }
 
+void codegen_assign(){
+  printf("%s = %s\n", st[top-1], st[top-2]);
+  top = top - 2;
+}
+
 void codegen_while1(){
   label[ltop++] = lnum;
   printf("L%d :", lnum++);
@@ -353,7 +359,7 @@ void codegen_while3(){
 	}
 }
 
-lab1()
+void lab1()
 {
  lnum++;
  strcpy(temp,"t");
@@ -364,7 +370,7 @@ lab1()
  label[++ltop]=lnum;
 }
 
-lab2()
+void lab2()
 {
 int x;
 lnum++;
@@ -374,7 +380,7 @@ printf("L%d: \n",x);
 label[++ltop]=lnum;
 }
 
-lab3()
+void lab3()
 {
 int y;
 y=label[ltop--];
