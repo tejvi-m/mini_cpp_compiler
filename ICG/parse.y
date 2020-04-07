@@ -125,17 +125,17 @@ COND
 
 
 ASSIGN_EXPR
-      : ID {push($1);} T_eq ARITH_EXPR {codegen();};
-      | TYPE ID  T_eq ARITH_EXPR { push($2); codegen();}
+      : ID T_eq ARITH_EXPR {push($1);codegen_assign();};
+      | TYPE ID T_eq ARITH_EXPR { push($2); codegen_assign();}
       | TYPE ID
       | TYPE ID COMMA X
-      | TYPE ID T_eq ARITH_EXPR { push($2); codegen();} COMMA X
+      | TYPE ID T_eq ARITH_EXPR { push($2); codegen_assign();} COMMA X
       ;
 
 X : ID COMMA X
   | ID
-  | ID T_eq ARITH_EXPR { push($1); codegen();} COMMA X
-  | ID T_eq ARITH_EXPR { push($1); codegen();}
+  | ID T_eq ARITH_EXPR { push($1); codegen_assign();} COMMA X
+  | ID T_eq ARITH_EXPR { push($1); codegen_assign();}
   ;
 
 ARITH_EXPR
@@ -319,27 +319,9 @@ void codgen_un()
 	}
 }
 
-void codegen_if1(){
-  strcpy(temp,"t");
-	strcat(temp,i_);
-  lnum++;
-	printf("%s = not %s\n",temp,st[top - 1]);
-	printf("if %s goto L%d\n",temp,lnum);
-	if(i_[1]!='9')
-		i_[1]++;
-	else
-	{
-		i_[1] = '0';
-		i_[0]++;
-	}
-  label[++ltop] = lnum;
-}
-
-void codegen_if3(){
-  int y;
-  // printf("$$$$$$$$$$$$$$$$$");
-  y = label[ltop--];
-  printf("L%d: \n", y);
+void codegen_assign(){
+  printf("%s = %s\n", st[top-1], st[top-2]);
+  top = top - 2;
 }
 
 void codegen_while1(){
@@ -377,7 +359,7 @@ void codegen_while3(){
 	}
 }
 
-lab1()
+void lab1()
 {
  lnum++;
  strcpy(temp,"t");
@@ -388,7 +370,7 @@ lab1()
  label[++ltop]=lnum;
 }
 
-lab2()
+void lab2()
 {
 int x;
 lnum++;
@@ -398,7 +380,7 @@ printf("L%d: \n",x);
 label[++ltop]=lnum;
 }
 
-lab3()
+void lab3()
 {
 int y;
 y=label[ltop--];
