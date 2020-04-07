@@ -80,10 +80,14 @@ LOOPS
         codegen_while3();
       }
       | FOR OB ASSIGN_EXPR TERMINATOR COND TERMINATOR statement CB LOOPBODY
-      | IF OB COND CB {lab1();} LOOPBODY {lab2();}
+      | IF OB COND CB {lab1();} LOOPBODY {lab2();} ELSEBODY
       /* | IF OB COND CB {lab1();} LOOPBODY {lab2();} ELSE LOOPBODY */
       ;
 
+ELSEBODY:
+      ELSE LOOPBODY
+      |
+      ;
 
 LOOPBODY
 	  : OBR C CBR {
