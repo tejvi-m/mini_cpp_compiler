@@ -22,77 +22,77 @@ digit [0-9]
 
 \n {yylineno++;}
 
-int {printf("%d\t%s\tTYPE\n", yylineno, yytext);  yylval = strdup(yytext); return INT;}
-float {printf("%d\t%s\tTYPE\n", yylineno, yytext); yylval = strdup(yytext); return FLOAT;}
-char {printf("%d\t%s\tTYPE\n", yylineno, yytext); yylval = strdup(yytext); return CHAR;}
-"main()" {printf("%d\t%s\tKEYW\n", yylineno, yytext);  return MAINTOK;}
-for {printf("%d\t%s\tKEYW\n", yylineno, yytext);  return FOR;}
-while {printf("%d\t%s\tKEYW\n", yylineno, yytext);  return WHILE;}
+int {  yylval = strdup(yytext); return INT;}
+float { yylval = strdup(yytext); return FLOAT;}
+char { yylval = strdup(yytext); return CHAR;}
+"main()" {  return MAINTOK;}
+for {  return FOR;}
+while {  return WHILE;}
 
-return {printf("%d\t%s\tKEYW\n", yylineno, yytext); return RETURN;}
-if {printf("%d\t%s\tKEYW\n", yylineno, yytext); return IF;}
-else {printf("%d\t%s\tKEYW\n", yylineno, yytext); return ELSE;}
+return { return RETURN;}
+if { return IF;}
+else { return ELSE;}
 
 
-cout {printf("%d\t%s\tKEYW\n", yylineno, yytext);yylval = strdup(yytext); return COUT;}
-endl {printf("%d\t%s\tKEYW\n", yylineno, yytext); return ENDL;}
-break {printf("%d\t%s\tKEYW\n", yylineno, yytext); return BREAK;}
-continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
+cout {yylval = strdup(yytext); return COUT;}
+endl { return ENDL;}
+break { return BREAK;}
+continue { return CONTINUE;}
 
 {alphabet}({alphabet}|{digit})* {
-                                printf("%d\t%s\tID\n", yylineno, yytext);
+
                                 yylval = strdup(yytext);
                                 return ID;}
 
-"#include"  {printf("%d\t%s\tKEYW\n", yylineno, yytext); return INCLUDE;}
+"#include"  {return INCLUDE;}
 
-{alphabet}({alphabet}|{digit})*"\.h"?  {printf("%d\t%s\tPREPROCESSOR\n", yylineno, yytext); return H;}
-
-
-
-
-
-\( {printf("%d\t%s\tOPEN BRACKETS\n", yylineno,yytext); return OB;}
-\) {printf("%d\t%s\tCLOSE BRACKETS\n", yylineno, yytext); return CB;}
+{alphabet}({alphabet}|{digit})*"\.h"?  { return H;}
 
 
 
 
-\{ { printf("%d\t%s\tOPEN BRACES\n", yylineno, yytext); return OBR;}
-\} { printf("%d\t%s\tCLOSE BRACES\n", yylineno, yytext); return CBR;}
+
+\( { return OB;}
+\) { return CB;}
 
 
 
 
-{digit}+ {printf("%d\t%s\tINTEGER\n", yylineno, yytext); yylval = strdup(yytext); return NUM;}
-{digit}+\.{digit}+(E(\+|\-)?{digit}+)? {printf("%d\t%s\tFLOATING POINT NUMBER\n", yylineno, yytext); return FLT;}
+\{ { return OBR;}
+\} {  return CBR;}
 
-\".*\" {printf("%d\t%s\tSTRING CONSTANT\n", yylineno, yytext);  yylval = strdup(yytext); return STRING;}
-"==" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext); return T_eqeq;}
-"!=" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext);  return T_neq;}
-">=" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext);  yylval = strdup(yytext); return T_gteq;}
-"<=" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext);  return T_lteq;}
-"<" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext);  return T_lt;}
-">" {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext);  yylval = strdup(yytext); return T_gt;}
-\+\+ {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext);  return T_incr;}
--- {printf("%d\t%s\tUNARY OPERATORS\n", yylineno, yytext); yylval = strdup(yytext);  return T_decr;}
 
-\+ {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext); return T_pl;}
-\- {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext);  return T_min;}
-\/ {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext);  return T_div;}
-\* {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext); return T_mul;}
-&& {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext); return T_and;}
-\|\| {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext); return T_or;}
-! {printf("%d\t%s\tLOGICAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext);  return T_not;}
 
-= {printf("%d\t%s\tASSIGNMENT\n", yylineno, yytext); yylval = strdup(yytext);  return T_eq;}
-";" {printf("%d\t%s\tTERMINATOR\n", yylineno, yytext); yylval = strdup(yytext); return TERMINATOR;}
-"," {printf("%d\t%s\tCOMMA\n", yylineno, yytext);  yylval = strdup(yytext); return COMMA;}
+
+{digit}+ {yylval = strdup(yytext); return NUM;}
+{digit}+\.{digit}+(E(\+|\-)?{digit}+)? {return FLT;}
+
+\".*\" {  yylval = strdup(yytext); return STRING;}
+"==" { yylval = strdup(yytext); return T_eqeq;}
+"!=" { yylval = strdup(yytext);  return T_neq;}
+">=" {  yylval = strdup(yytext); return T_gteq;}
+"<=" { yylval = strdup(yytext);  return T_lteq;}
+"<" { yylval = strdup(yytext);  return T_lt;}
+">" {  yylval = strdup(yytext); return T_gt;}
+\+\+ { yylval = strdup(yytext);  return T_incr;}
+-- { yylval = strdup(yytext);  return T_decr;}
+
+\+ { yylval = strdup(yytext); return T_pl;}
+\- { yylval = strdup(yytext);  return T_min;}
+\/ { yylval = strdup(yytext);  return T_div;}
+\* { yylval = strdup(yytext); return T_mul;}
+&& { yylval = strdup(yytext); return T_and;}
+\|\| { yylval = strdup(yytext); return T_or;}
+! { yylval = strdup(yytext);  return T_not;}
+
+= { yylval = strdup(yytext);  return T_eq;}
+";" { yylval = strdup(yytext); return TERMINATOR;}
+"," {  yylval = strdup(yytext); return COMMA;}
 \t ;
 
 " " ;
 
-\"(\\.|[^"\\])*\" {printf("%d\t%s\tSTRING CONSTANT\n", yylineno, yytext); yylval = strdup(yytext); return STRING;}
+\"(\\.|[^"\\])*\" { yylval = strdup(yytext); return STRING;}
 
 
 . {printf("%d\t%s\ERROR\n", yylineno, yytext);}
