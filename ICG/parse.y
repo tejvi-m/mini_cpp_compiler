@@ -121,17 +121,17 @@ COND
 
 
 ASSIGN_EXPR
-      : ID T_eq ARITH_EXPR
-      | TYPE ID T_eq ARITH_EXPR
+      : ID {push($1);} T_eq ARITH_EXPR {codegen();};
+      | TYPE ID  T_eq ARITH_EXPR { push($2); codegen();}
       | TYPE ID
       | TYPE ID COMMA X
-      | TYPE ID T_eq ARITH_EXPR COMMA X
+      | TYPE ID T_eq ARITH_EXPR { push($2); codegen();} COMMA X
       ;
 
 X : ID COMMA X
   | ID
-  | ID T_eq ARITH_EXPR COMMA X
-  | ID T_eq ARITH_EXPR
+  | ID T_eq ARITH_EXPR { push($1); codegen();} COMMA X 
+  | ID T_eq ARITH_EXPR { push($1); codegen();}
   ;
 
 ARITH_EXPR
@@ -156,14 +156,14 @@ ARITH_EXPR
 
 /* ADDSUB
       : TERM {$$=$1;}
-      | ARITH_EXPR T_pl TERM { push((char*)$2); $$= addToTree((char *) $2, $1, $3, NULL, 0); codegen();}
-      | ARITH_EXPR T_min TERM {push((char*)$2); $$= addToTree((char *) $2, $1, $3, NULL, 0); codegen();}
+      | ARITH_EXPR T_pl TERM { push($2); $$= addToTree((char *) $2, $1, $3, NULL, 0); codegen();}
+      | ARITH_EXPR T_min TERM {push($2); $$= addToTree((char *) $2, $1, $3, NULL, 0); codegen();}
       ;
 
 TERM
 	  : FACTOR {$$=$1;}
-      | TERM T_mul FACTOR { push((char*)$2); $$= addToTree((char *) $2, $1, $3, NULL, 0); codegen();}
-      | TERM T_div FACTOR { push((char*)$2); $$= addToTree((char *) $2, $1, $3, NULL, 0); codegen();}
+      | TERM T_mul FACTOR { push($2); $$= addToTree((char *) $2, $1, $3, NULL, 0); codegen();}
+      | TERM T_div FACTOR { push($2); $$= addToTree((char *) $2, $1, $3, NULL, 0); codegen();}
       ;
 
 FACTOR
@@ -184,10 +184,10 @@ PRINT
       ;
 LIT
       : ID {
-            push((char*)$1);
+            push($1);
         }
       | NUM {
-        push((char*)$1);
+        push($1);
       }
       ;
 TYPE
@@ -196,34 +196,34 @@ TYPE
       | FLOAT
       ;
 RELOP
-      : T_lt {push((char*)$1);}
-      | T_gt {push((char*)$1);}
-      | T_lteq {push((char*)$1);}
-      | T_gteq {push((char*)$1);}
-      | T_neq {push((char*)$1);}
-      | T_eqeq {push((char*)$1);}
+      : T_lt {push($1);}
+      | T_gt {push($1);}
+      | T_lteq {push($1);}
+      | T_gteq {push($1);}
+      | T_neq {push($1);}
+      | T_eqeq {push($1);}
       ;
 
 
 bin_arop
-      : T_pl {push((char*)$1);}
-      | T_min {push((char*)$1);}
-      | T_mul {push((char*)$1);}
-      | T_div {push((char*)$1);}
+      : T_pl {push($1);}
+      | T_min {push($1);}
+      | T_mul {push($1);}
+      | T_div {push($1);}
       ;
 
 bin_boolop
-      : T_and {push((char*)$1);}
-      | T_or {push((char*)$1);}
+      : T_and {push($1);}
+      | T_or {push($1);}
       ;
 
 un_arop
-      : T_incr {push((char*)$1);}
-      | T_decr {push((char*)$1);}
+      : T_incr {push($1);}
+      | T_decr {push($1);}
       ;
 
 un_boolop
-      : T_not {push((char*)$1);}
+      : T_not {push($1);}
       ;
 %%
 
