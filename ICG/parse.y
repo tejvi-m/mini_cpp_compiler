@@ -343,6 +343,7 @@ void codegen_while2(){
 		i_[0]++;
 	}
       // printf("%d %d\n", label[ltop - 1], label[ltop - 2]);
+      
 }
 void codegen_while3(){
       strcpy(temp,"t");
@@ -390,7 +391,11 @@ printf("L%d: \n",y);
 
 void lab1_for()
 {
-	printf("L%d : \n",lnum++);
+      label[ltop++] = ++lnum;
+      printf("L%d : \n",label[ltop - 1]);
+      label[ltop++] = ++lnum;
+      label[ltop++] = ++lnum;
+      label[ltop++] = ++lnum;
 }
 
 void lab2_for(int s)
@@ -399,7 +404,7 @@ void lab2_for(int s)
 	strcat(temp,i_);
 	if(s!=0)
 		printf("%s = not %s\n",temp,st[top -1]);
-	printf("if %s goto L%d\n",temp,lnum++);
+	printf("if %s goto L%d\n",temp,label[ltop - 1]);
 	if(i_[1]!='9')
 		i_[1]++;
 	else
@@ -407,21 +412,22 @@ void lab2_for(int s)
 		i_[1] = '0';
 		i_[0]++;
 	}
-	printf("goto L%d\n", lnum++);
-  printf("L%d :\n", lnum++);
+	printf("goto L%d\n", label[ltop - 3]);
+  printf("L%d :\n", label[ltop - 2]);
 
 }
 
 void lab3_for()
 {
-  printf("goto L%d\n", lnum - 4);
-  printf("L%d :\n", lnum - 2);
+  printf("goto L%d\n", label[ltop - 4]);
+  printf("L%d :\n", label[ltop - 3]);
 }
 
 void lab4_for()
 {
-	printf("goto L%d \n",lnum - 1);
-	printf("L%d : \n",lnum - 3);
+	printf("goto L%d \n",label[ltop - 2]);
+	printf("L%d : \n",label[ltop - 1]);
+      ltop = ltop - 4;
 }
 
 int main()
