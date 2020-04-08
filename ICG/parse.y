@@ -76,14 +76,14 @@ SELECTION:
       IF OB COND CB {lab1();} LOOPBODY {lab2();} ElseBody{lab3();}
       ;
 ElseBody:
-      ELSE LOOPBODY 
+      ELSE LOOPBODY
       |%empty
       ;
 LOOPS
       : WHILE{codegen_while1();} OB COND CB {codegen_while2();} LOOPBODY {
         codegen_while3();
       }
-      | FOR OB ASSIGN_EXPR TERMINATOR COND TERMINATOR statement CB LOOPBODY
+      | FOR OB ASSIGN_EXPR TERMINATOR {lab1_for();} COND TERMINATOR {lab2_for();} statement {lab3_for();} CB LOOPBODY {lab4_for();}
       ;
 
 LOOPBODY
@@ -381,6 +381,42 @@ void lab3()
 int y;
 y=label[ltop--];
 printf("L%d: \n",y);
+}
+
+void lab1_for()
+{
+	printf("L%d : \n",lnum++);
+}
+
+void lab2_for(int s)
+{
+	strcpy(temp,"t");
+	strcat(temp,i_);
+	if(s!=0)
+		printf("%s = not %s\n",temp,st[top -1]);
+	printf("if %s goto L%d\n",temp,lnum++);
+	if(i_[1]!='9')
+		i_[1]++;
+	else
+	{
+		i_[1] = '0';
+		i_[0]++;
+	}
+	printf("goto L%d\n", lnum++);
+  printf("L%d :\n", lnum++);
+
+}
+
+void lab3_for()
+{
+  printf("goto L%d\n", lnum - 4);
+  printf("L%d :\n", lnum - 2);
+}
+
+void lab4_for()
+{
+	printf("goto L%d \n",lnum - 1);
+	printf("L%d : \n",lnum - 3);
 }
 
 int main()
