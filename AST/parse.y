@@ -131,7 +131,7 @@ LOOPS
         astnode** siblings = (astnode**) malloc(sizeof(astnode*) * 2);
         
         siblings[0] = $7;
-        siblings[1] = ASSIGN_EXPR;
+        siblings[1] = $3;
         // siblings[2] = statement;
         
         $$ = addToTree("for", $5, $9, siblings, 2);
