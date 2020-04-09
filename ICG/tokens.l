@@ -86,6 +86,10 @@ continue { return CONTINUE;}
 ! { yylval = strdup(yytext);  return T_not;}
 
 = { yylval = strdup(yytext);  return T_eq;}
+\*= { yylval = strdup(yytext);  return S_mul;}
+\+= { yylval = strdup(yytext);  return S_add;}
+-= { yylval = strdup(yytext);  return S_min;}
+\/= { yylval = strdup(yytext);  return S_div;}
 ";" { yylval = strdup(yytext); return TERMINATOR;}
 "," {  yylval = strdup(yytext); return COMMA;}
 \t ;

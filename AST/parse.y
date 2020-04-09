@@ -52,7 +52,7 @@ extern void decrScope();
 %}
 
 %define parse.error verbose
-%token ID NUM T_lt T_gt COMMA STRC TERMINATOR RETURN FLT T_lteq T_gteq T_neq T_eqeq T_pl T_min T_mul T_div T_and T_or T_incr T_decr T_not T_eq WHILE INT CHAR FLOAT VOID H MAINTOK INCLUDE BREAK CONTINUE IF ELSE COUT STRING FOR OB CB OBR CBR ENDL
+%token ID NUM T_lt T_gt COMMA STRC TERMINATOR RETURN FLT T_lteq T_gteq T_neq T_eqeq T_pl S_min S_mul S_add S_div T_min T_mul T_div T_and T_or T_incr T_decr T_not T_eq WHILE INT CHAR FLOAT VOID H MAINTOK INCLUDE BREAK CONTINUE IF ELSE COUT STRING FOR OB CB OBR CBR ENDL
 %left T_pl T_div T_mul T_min T_lteq T_gteq T_lt T_gt T_eqeq T_and T_or
 %right T_eq T_incr T_decr T_not 
 %%
@@ -173,9 +173,28 @@ statement
       : ASSIGN_EXPR {$$ = $1;}
       | ARITH_EXPR
       | TERNARY_EXPR
+      | SUGAR_OPS { $$ = $1; }
       | PRINT
       | RETURN ASSIGN_EXPR
       | RETURN ARITH_EXPR
+      ;
+
+SUGAR_OPS:
+      ID s_ops ARITH_EXPR { 
+          int id =  insert(&count, t_scope, tdType, $1, yylineno);
+          if(id == -1){
+            printf("redeclared: %s\n", $1);
+            yyerror("Variable redeclared");
+          }
+
+          astnode* newnode =addToTree((char*) $1, NULL, NULL, NULL, 0);
+          setScopeAndPtr(newnode, t_scope, id);
+          char temp[] = "";
+          char ch = ((char*)$2)[0];
+          strncat(temp, &ch, 1);
+          astnode* rhs = addToTree((char*)temp, newnode, $3, NULL, 0);
+          $$ = addToTree("=", newnode, rhs, NULL, 0);
+       }
       ;
 
 
@@ -411,6 +430,13 @@ un_arop
 
 un_boolop
       : T_not
+      ;
+
+s_ops:
+      S_mul 
+      | S_add 
+      | S_min 
+      | S_div 
       ;
 %%
 
