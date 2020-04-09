@@ -68,8 +68,8 @@ S: START {
       ;
 
 START
-    : INCLUDE T_lt H T_gt MAIN
-    | INCLUDE '\"' H '\"' MAIN
+    : INCLUDE T_lt ID T_gt MAIN
+    | INCLUDE '\"' ID '\"' MAIN
     ;
 
 
@@ -480,10 +480,10 @@ void printTree(astnode *tree)
 
 void setScopeAndPtr(astnode* node, int scope, int ptr){
   node -> entry = ptr;
-  if(scope >= 0) node -> scope = symTable[ptr].scope;
+  if(scope > 0) node -> scope = symTable[ptr].scope;
   node -> isID = 1;
 
-  printf("added id: %s with scope %d and ptr %d\n", node -> name, node -> scope, node -> entry);
+  printf("added id: %s with pointing to index %d of the symbol table\n", node -> name, node -> entry);
 }
 
 int yyerror(const char *s)
@@ -497,7 +497,7 @@ int main()
 {
 	yyparse();
 	if(valid)
-  		printf("Parsing successful\n\n\n");
+  		printf("\nParsing successful\n\n\n");
 	else
 	{
   		printf("Parsing unsuccessful\n\n\n");
