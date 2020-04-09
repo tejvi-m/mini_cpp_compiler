@@ -107,7 +107,7 @@ statement
       ;
 
 SUGAR_OPS:
-      | ID {push($1);} s_ops ARITH_EXPR {codegen_syns();}
+      ID {push($1);} s_ops ARITH_EXPR {codegen_syns();}
       ;
 
 
@@ -233,7 +233,7 @@ un_boolop
       ;
 
 s_ops:
-      | S_mul {push($1);}
+      S_mul {push($1);}
       | S_add {push($1);}
       | S_min {push($1);}
       | S_div {push($1);}
