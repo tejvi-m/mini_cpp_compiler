@@ -1,4 +1,4 @@
-lex tokens.l 
-yacc -y -d parse.y  -Wall
-gcc lex.yy.c y.tab.c -g -Wall
+lex -w tokens.l
+yacc -y -d parse.y -Wnone
+gcc lex.yy.c y.tab.c -Wall
 ./a.out < test.cpp
