@@ -127,7 +127,15 @@ LOOPS
       : WHILE OB COND CB LOOPBODY {
         $$ = addToTree("while", $3, $5, NULL, 0);
       }
-      | FOR OB ASSIGN_EXPR TERMINATOR COND TERMINATOR statement CB LOOPBODY
+      | FOR OB ASSIGN_EXPR TERMINATOR COND TERMINATOR statement CB LOOPBODY{
+        astnode** siblings = (astnode**) malloc(sizeof(astnode*) * 2);
+        
+        siblings[0] = $7;
+        siblings[1] = ASSIGN_EXPR;
+        // siblings[2] = statement;
+        
+        $$ = addToTree("for", $5, $9, siblings, 2);
+      }
       | IF OB COND CB LOOPBODY {
          $$ = addToTree("if", $3, $5, NULL, 0);
       }
