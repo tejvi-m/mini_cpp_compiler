@@ -16,7 +16,7 @@ extern int yylineno;
 %}
 
 %define parse.error verbose
-%token ID NUM T_lt T_gt COMMA STRC TERMINATOR RETURN FLT T_lteq T_gteq T_neq T_eqeq T_pl T_min T_mul T_div T_and T_or T_incr T_decr T_not T_eq WHILE INT CHAR FLOAT VOID H MAINTOK INCLUDE BREAK CONTINUE IF ELSE COUT STRING FOR OB CB OBR CBR ENDL
+%token ID NUM T_lt T_gt COMMA STRC TERMINATOR RETURN FLT T_lteq T_gteq T_neq T_eqeq T_pl S_min S_add S_mul S_div T_min T_mul T_div T_and T_or T_incr T_decr T_not T_eq WHILE INT CHAR FLOAT VOID H MAINTOK INCLUDE BREAK CONTINUE IF ELSE COUT STRING FOR OB CB OBR CBR ENDL
 
 %right T_eq
 %left T_or
@@ -100,10 +100,16 @@ statement
       : ASSIGN_EXPR
       | ARITH_EXPR
       | TERNARY_EXPR
+      | SUGAR_OPS
       | PRINT
       | RETURN ASSIGN_EXPR
       | RETURN ARITH_EXPR
       ;
+
+SUGAR_OPS:
+      | ID {push($1);} s_ops ARITH_EXPR {codegen_syns();}
+      ;
+
 
 COND
       : LIT RELOP LIT {
@@ -225,6 +231,13 @@ un_arop
 un_boolop
       : T_not {push($1);}
       ;
+
+s_ops:
+      | S_mul {push($1);}
+      | S_add {push($1);}
+      | S_min {push($1);}
+      | S_div {push($1);}
+      ;
 %%
 
 
@@ -313,6 +326,11 @@ void codgen_un()
 		i_[1] = '0';
 		i_[0]++;
 	}
+}
+
+void codegen_syns(){
+  printf("%s %c %s %c %s\n", st[top-3], st[top-2][1], st[top-3], st[top-2][0], st[top - 1]);
+  top = top - 2;   
 }
 
 void codegen_assign(){
