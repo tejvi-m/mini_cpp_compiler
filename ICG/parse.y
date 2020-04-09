@@ -350,7 +350,7 @@ void codegen_while1(){
 void codegen_while2(){
       strcpy(temp,"t");
 	strcat(temp,i_);
-      
+
 	printf("%s = not %s\n",temp,st[top - 1]);
 	printf("if %s goto L%d\n",temp,label[ltop-1]);
 	if(i_[1]!='9')
@@ -361,13 +361,13 @@ void codegen_while2(){
 		i_[0]++;
 	}
       // printf("%d %d\n", label[ltop - 1], label[ltop - 2]);
-      
+
 }
 void codegen_while3(){
       strcpy(temp,"t");
 	strcat(temp,i_);
 	printf("goto L%d\n",label[ltop - 2]);
-	printf("L%d\n",label[ltop - 1]);
+	printf("L%d:\n",label[ltop - 1]);
       ltop = ltop - 2;
 	if(i_[1]!='9')
 		i_[1]++;
