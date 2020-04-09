@@ -53,8 +53,8 @@ extern void decrScope();
 
 %define parse.error verbose
 %token ID NUM T_lt T_gt COMMA STRC TERMINATOR RETURN FLT T_lteq T_gteq T_neq T_eqeq T_pl S_min S_mul S_add S_div T_min T_mul T_div T_and T_or T_incr T_decr T_not T_eq WHILE INT CHAR FLOAT VOID H MAINTOK INCLUDE BREAK CONTINUE IF ELSE COUT STRING FOR OB CB OBR CBR ENDL
-%left T_pl T_div T_mul T_min T_lteq T_gteq T_lt T_gt T_eqeq T_and T_or
-%right T_eq T_incr T_decr T_not 
+
+
 %%
 S: START {
         printf("Successful parsing.\n");
@@ -139,17 +139,17 @@ LOOPS
             astnode** siblings = (astnode**) malloc(sizeof(astnode*) * 1);
             siblings[0] = elsePart;
 
-            $$ = addToTree("condition", $3, ifPart, siblings, 1);
+            $$ = addToTree("condition", $3, ifPart, siblings, 2);
           }
       | IF OB COND CB LOOPBODY ELSE LOOPS {
 
               astnode* elsePart = addToTree("else", $7, NULL, NULL, 0);
               astnode* ifPart = addToTree("if", $5, NULL, NULL, 0);
 
-              astnode** siblings = (astnode**) malloc(sizeof(astnode*) * 1);
+              astnode** siblings = (astnode**) malloc(sizeof(astnode*) * 2);
               siblings[0] = elsePart;
 
-              $$ = addToTree("condition", $3, ifPart, siblings, 1);
+              $$ = addToTree("condition", $3, ifPart, siblings, 2);
         }
       ;
 
@@ -180,7 +180,7 @@ statement
       ;
 
 SUGAR_OPS:
-      ID s_ops ARITH_EXPR { 
+      ID s_ops ARITH_EXPR {
           int id =  insert(&count, t_scope, tdType, $1, yylineno);
           if(id == -1){
             printf("redeclared: %s\n", $1);
@@ -330,19 +330,7 @@ X : ID COMMA X {
 
 ARITH_EXPR
       : LIT
-      | ARITH_EXPR T_pl ARITH_EXPR {
-        $$=addToTree((char *) $2, $1, $3, NULL, 0);
-      }
-      | ARITH_EXPR T_min ARITH_EXPR{
-        $$=addToTree((char *) $2, $1, $3, NULL, 0);
-      }
-      | ARITH_EXPR T_mul ARITH_EXPR{
-        $$=addToTree((char *) $2, $1, $3, NULL, 0);
-      }
-      |ARITH_EXPR T_div ARITH_EXPR{
-        $$=addToTree((char *) $2, $1, $3, NULL, 0);
-      }
-      | LIT bin_arop LIT{
+      | LIT bin_arop ARITH_EXPR {
         $$=addToTree((char *) $2, $1, $3, NULL, 0);
       }
       | LIT bin_boolop ARITH_EXPR {
@@ -433,10 +421,10 @@ un_boolop
       ;
 
 s_ops:
-      S_mul 
-      | S_add 
-      | S_min 
-      | S_div 
+      S_mul
+      | S_add
+      | S_min
+      | S_div
       ;
 %%
 
