@@ -42,8 +42,8 @@ S: START {
       ;
 
 START
-    : INCLUDE T_lt H T_gt MAIN
-    | INCLUDE '\"' H '\"' MAIN
+    : INCLUDE T_lt ID T_gt MAIN
+    | INCLUDE '\"' ID '\"' MAIN
     ;
 
 
@@ -330,7 +330,7 @@ void codgen_un()
 
 void codegen_syns(){
   printf("%s %c %s %c %s\n", st[top-3], st[top-2][1], st[top-3], st[top-2][0], st[top - 1]);
-  top = top - 2;   
+  top = top - 2;
 }
 
 void codegen_assign(){
