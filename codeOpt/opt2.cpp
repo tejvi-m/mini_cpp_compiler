@@ -58,7 +58,7 @@ vector<string> removeDeadCode(vector<string> program){
         if(line != ""){
           boost::split(words, line, boost::is_any_of(" "), boost::token_compress_on);
           if(words.size() > 1 && words[1] == "="){
-            for(int i = 2; i < words.size(); i++){
+              for(int i = 2; i < words.size(); i++){
               if(words[i][0] == 't'){
                 RHStemps.insert(words[i]);
               }
@@ -66,6 +66,7 @@ vector<string> removeDeadCode(vector<string> program){
 
           }
     }
+  }
 
     for(auto line: program){
           if(line != ""){
@@ -82,7 +83,7 @@ vector<string> removeDeadCode(vector<string> program){
     }
     else return removeDeadCode(new_prg);
 
-  }
+  
 }
 
 bool is_number(const std::string& s)
