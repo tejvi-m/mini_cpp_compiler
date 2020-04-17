@@ -41,7 +41,8 @@ extern void decrScope();
 
 %define parse.error verbose
 %token ID NUM T_lt T_gt COMMA STRC TERMINATOR RETURN FLT T_lteq T_gteq T_neq T_eqeq T_pl T_min T_mul T_div T_and T_or T_incr T_decr T_not T_eq WHILE INT CHAR FLOAT VOID H MAINTOK INCLUDE BREAK CONTINUE IF ELSE COUT STRING FOR OB CB OBR CBR ENDL
-
+%left T_pl T_min
+%left T_mul T_div 
 
 %%
 S
@@ -183,49 +184,51 @@ X : ID COMMA X {
 
 ARITH_EXPR
       : LIT{
-            int lhs;
+            int val;
             if(atoi($1)){
-                  lhs = atoi($1);
+                  val = atoi($1);
             }
             else{
                   int idx = find(t_scope, $1);
-                  lhs = symTable[idx].value;
+                  val = symTable[idx].value;
                   
             } 
-            $$ = lhs;
-            // printf("expression value1    %d\n", $$);
+            $$ = val;
+          
       }
-      | LIT bin_arop ARITH_EXPR{
-            int lhs;
-            if(atoi($1)){
-                  lhs = atoi($1);
-            }
-            else{
-                  int idx = find(t_scope, $1);
-                  lhs = symTable[idx].value;
-                  
-            }
-            if(!strcmp($2, "+")){
-                  $$ = lhs + (int)$3;
-            }
-            else if(!strcmp($2, "-")){
-                  $$ = lhs - (int)$3;
-            }
-            else if(!strcmp($2, "*")){
-                  $$ = lhs * (int)$3;
-            }
-            else if(!strcmp($2, "/")){
-                  $$ = lhs / (int)$3;
-            }
-
-            // printf("expression value    %d\n", $$);
-      }
+      | ARITH_NEW {$$ = $1;}
       | LIT bin_boolop ARITH_EXPR
       | LIT un_arop
       | un_arop ARITH_EXPR
       | un_boolop ARITH_EXPR
       ;
 
+ARITH_NEW:
+      LIT{
+            int val;
+            if(atoi($1)){
+                  val = atoi($1);
+            }
+            else{
+                  int idx = find(t_scope, $1);
+                  val = symTable[idx].value;
+                  
+            } 
+            $$ = val; 
+      }
+      | ARITH_NEW T_pl ARITH_NEW{
+            $$ = (int)$1 + (int)$3;
+      }
+      | ARITH_NEW T_min ARITH_NEW{
+            $$ = (int)$1 - (int)$3;
+      }
+      | ARITH_NEW T_mul ARITH_NEW{
+            $$ = (int)$1 * (int)$3;
+      }
+      | ARITH_NEW T_div ARITH_NEW{
+            $$ = (int)$1 / (int)$3;
+      }
+      ;
 
 TERNARY_EXPR
       : OB COND CB '?' statement ':' statement
