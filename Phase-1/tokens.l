@@ -100,10 +100,10 @@ continue {printf("%d\t%s\tKEYW\n", yylineno, yytext); return CONTINUE;}
 \+\+ {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_incr;}
 -- {printf("%d\t%s\tUNARY OPERATORS\n", yylineno, yytext); return T_decr;}
 
-\+ {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_pl;}
-\- {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_min;}
-\/ {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_div;}
-\* {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_mul;}
+\+ {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext); return T_pl;}
+\- {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext); return T_min;}
+\/ {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext); return T_div;}
+\* {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); yylval = strdup(yytext); return T_mul;}
 && {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_and;}
 \|\| {printf("%d\t%s\tRELATIONAL OPERATORS\n", yylineno, yytext); return T_or;}
 ! {printf("%d\t%s\tLOGICAL OPERATORS\n", yylineno, yytext); return T_neq;}
@@ -172,13 +172,11 @@ int find(int  scope, char *name){
   for(int i = 0; i < count; i++)
   {
     if(!strcmp(symTable[i].name, name) && symTable[i].scope <= scope && symTable[i].valid){
-        present = 1;
-        break;
+        return i;
     }
   }
-    return present;
+    return -1;
   }
-
 
 void incrScope(){
     for(int i = 0; i < count; i++)
