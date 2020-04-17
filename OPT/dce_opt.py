@@ -51,13 +51,33 @@ def process(icg):
     
     return icg, master_map
 
-def remove_reduntancy(processed_icg, master_map):
-    
+def redefine_rhs(master_map, rhs):
+    split_rhs = rhs.split()
+    for i in range(len(split_rhs)):
+        if(split_rhs[i] in master_map):
+            split_rhs[i] = str(master_map[split_rhs[i]])
+    return "".join(split_rhs)
 
+def substitute_vals(code, master_map):
+    for i in range(len(code)):
+        if("=" in code[i]):
+            split_snippet = code[i].split("=")
+            lhs = split_snippet[0]
+            rhs = split_snippet[-1]
+            rhs = redefine_rhs(master_map, rhs)
+            res = eval(rhs)
+            master_map[lhs.strip()] = res
+            code[i] = lhs + "= " + str(res)                
+    return code 
+
+def remove_redundant():
+    
 
 if __name__ == '__main__':
     code_statements = split_icg(sys.argv[1])
-    print(code_statements)
+    # print(code_statements)
     processed_icg, master_map = process(code_statements)
-    print(processed_icg, master_map)
-    compact_icg = remove_reduntancy(processed_icg, master_map)
+    print(processed_icg)
+    substituted_icg = substitute_vals(processed_icg, master_map)
+    print(substituted_icg)
+    compact_icg = remove_redundant(substituted_icg, master_map)
