@@ -5,6 +5,23 @@
 #include <string.h>
 #define YYSTYPE char *
 
+
+typedef struct node{
+      int scope;
+      int value;
+      char name[100];
+      char dtype[50];
+      int line_num;
+      int valid;
+}node;
+
+typedef struct table{
+      node* head;
+}table;
+// int count = 0;
+extern node symTable[1000];
+
+
 extern int yylineno;
 int valid=1;
 int yylex();
@@ -99,17 +116,17 @@ COND
 ASSIGN_EXPR
       : ID T_eq ARITH_EXPR {
 
-        if (!find(t_scope, $1)) {
+        if (find(t_scope, $1) == -1) {
           yyerror("variable not declared");
         }
-      update($1, atoi($3), t_scope);
+      update($1, $3, t_scope);
     }
 
       | TYPE ID T_eq ARITH_EXPR {
         if(!insert(&count, t_scope, $1, $2, yylineno))
               yyerror("Variable redeclared");
 
-        update($2, atoi($4), t_scope);
+        update($2, $4, t_scope);
       }
 
     |
@@ -165,8 +182,44 @@ X : ID COMMA X {
   }
 
 ARITH_EXPR
-      : LIT
-      | LIT bin_arop ARITH_EXPR
+      : LIT{
+            int lhs;
+            if(atoi($1)){
+                  lhs = atoi($1);
+            }
+            else{
+                  int idx = find(t_scope, $1);
+                  lhs = symTable[idx].value;
+                  
+            } 
+            $$ = lhs;
+            // printf("expression value1    %d\n", $$);
+      }
+      | LIT bin_arop ARITH_EXPR{
+            int lhs;
+            if(atoi($1)){
+                  lhs = atoi($1);
+            }
+            else{
+                  int idx = find(t_scope, $1);
+                  lhs = symTable[idx].value;
+                  
+            }
+            if(!strcmp($2, "+")){
+                  $$ = lhs + (int)$3;
+            }
+            else if(!strcmp($2, "-")){
+                  $$ = lhs - (int)$3;
+            }
+            else if(!strcmp($2, "*")){
+                  $$ = lhs * (int)$3;
+            }
+            else if(!strcmp($2, "/")){
+                  $$ = lhs / (int)$3;
+            }
+
+            // printf("expression value    %d\n", $$);
+      }
       | LIT bin_boolop ARITH_EXPR
       | LIT un_arop
       | un_arop ARITH_EXPR
@@ -187,7 +240,7 @@ PRINT
       ;
 LIT
       : ID {
-        if (!find(t_scope, $1)) {
+        if (find(t_scope, $1) == -1) {
             yyerror("variable not declared");
         }
       }
@@ -209,10 +262,18 @@ RELOP
 
 
 bin_arop
-      : T_pl
-      | T_min
-      | T_mul
-      | T_div
+      : T_pl{
+            $$ = $1;
+      }
+      | T_min{
+            $$ = $1;
+      }
+      | T_mul{
+            $$ = $1;
+      }
+      | T_div{
+            $$ = $1;
+      }
       ;
 
 bin_boolop
