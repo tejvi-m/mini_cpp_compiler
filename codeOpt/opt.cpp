@@ -78,7 +78,7 @@ void variable_propogate(vector<string>& program, unordered_set<string>& ignore){
                 expr += words[i];
               }
             }
-            if(words.size() == 5){
+            if( flag && words.size() == 5){
               IDs[words[0]] = eval(words);
               res.push_back(words[0] + " = " + to_string(IDs[words[0]]));
             }
