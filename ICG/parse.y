@@ -309,10 +309,17 @@ void codgen_un()
 {
 	strcpy(temp,"t");
 	strcat(temp,i_);
-  if(strlen(st[top - 2]) == 2){
+      
+  if((!strcmp(st[top - 2],"++")) || (!strcmp(st[top - 2],"--"))){
     printf(" %s = %s %c %d\n", temp, st[top-1], st[top-2][0], 1);
 
     printf("%s = %s\n", st[top - 1], temp);
+
+  }
+  else if((!strcmp(st[top - 1],"++")) || (!strcmp(st[top - 1],"--"))){
+    printf(" %s = %s %c %d\n", temp, st[top-2], st[top-1][0], 1);
+
+    printf("%s = %s\n", st[top - 2], temp);
 
   }
   else
