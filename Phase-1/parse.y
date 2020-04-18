@@ -116,7 +116,7 @@ COND
 
 ASSIGN_EXPR
       : ID T_eq ARITH_EXPR {
-
+      printf("sadfasdfd\n");
         if (find(t_scope, $1) == -1) {
           yyerror("variable not declared");
         }
@@ -198,8 +198,31 @@ ARITH_EXPR
       }
       | ARITH_NEW {$$ = $1;}
       | LIT bin_boolop ARITH_EXPR
-      | LIT un_arop
-      | un_arop ARITH_EXPR
+      | LIT un_arop{
+            int val;
+            if(atoi($1)){
+                  yyerror("needs an lvalue");
+            }
+            else{
+                  int idx = find(t_scope, $1);
+                  val = symTable[idx].value;
+                  update($1, val+1, t_scope);                  
+            } 
+            $$ = val;
+            
+      }
+      | un_arop ARITH_EXPR{
+            int val;
+            if(atoi($2)){
+                  yyerror("needs an lvalue");
+            }
+            else{
+                  int idx = find(t_scope, $2);
+                  val = symTable[idx].value + 1;
+                  update($2, val+1, t_scope);                  
+            } 
+            $$ = val;
+      }
       | un_boolop ARITH_EXPR
       ;
 
@@ -216,16 +239,16 @@ ARITH_NEW:
             } 
             $$ = val; 
       }
-      | ARITH_NEW T_pl ARITH_NEW{
+      | ARITH_EXPR T_pl ARITH_EXPR{
             $$ = (int)$1 + (int)$3;
       }
-      | ARITH_NEW T_min ARITH_NEW{
+      | ARITH_EXPR T_min ARITH_EXPR{
             $$ = (int)$1 - (int)$3;
       }
-      | ARITH_NEW T_mul ARITH_NEW{
+      | ARITH_EXPR T_mul ARITH_EXPR{
             $$ = (int)$1 * (int)$3;
       }
-      | ARITH_NEW T_div ARITH_NEW{
+      | ARITH_EXPR T_div ARITH_EXPR{
             $$ = (int)$1 / (int)$3;
       }
       ;
@@ -285,8 +308,12 @@ bin_boolop
       ;
 
 un_arop
-      : T_incr
-      | T_decr
+      : T_incr{
+            $$ = $1;
+      }
+      | T_decr{
+            $$ = $1;
+      }
       ;
 
 un_boolop
