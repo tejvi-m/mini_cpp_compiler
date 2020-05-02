@@ -98,7 +98,33 @@ def gen_arith_exprs(mappings, data_segments, expanded_rhs, lhs):
 
         else:
             print("SUB " + mappings[lhs.strip()] + ", " + mappings[expanded_rhs[0]] + ", " + mappings[expanded_rhs[2]])
-    
+    else:
+        #no divisions
+        if(expanded_rhs[0].isnumeric()):
+            temp_reg = "R" + str(maxNum)
+            print("MOV " + temp_reg + ", #" + mappings[expanded_rhs[0]])
+            print("CMP " +  temp_reg + ", " +  mappings[expanded_rhs[2]])
+
+        elif(expanded_rhs[2].isnumeric()):
+            print("CMP " +  mappings[expanded_rhs[0]] + ", #" + expanded_rhs[2])
+            
+        else:
+            print("CMP " + mappings[expanded_rhs[0]] + ", " + mappings[expanded_rhs[2]])
+        if(expanded_rhs[1] == "<"):
+            flag = "LT"
+        elif(expanded_rhs[1] == "<="):
+            flag = "LE"
+        elif(expanded_rhs[1] == ">"):
+            flag = "GT"
+        elif(expanded_rhs[1] == ">="):
+            flag = "GE"
+        elif(expanded_rhs[1] == "=="):
+            flag = "EQ"
+    if(lhs.strip() in data_segments):
+        temp_reg = "R" + str(maxNum)
+        print("LDR " + temp_reg + " ,=" + lhs.strip())
+        print("STR "+ mappings[lhs.strip()] + ",["+ temp_reg +"]")
+
 def gen_exps(mappings, data_segments, icg):
     for i in range(len(icg)):
         tokens = icg[i].strip().split()
@@ -113,12 +139,12 @@ def gen_exps(mappings, data_segments, icg):
             # label
             print(icg[i])
         elif tokens[0] == "if" and tokens[2] == "goto":
-            # print("conds", flag)
+            print("conds", flag)
             #condition stuff
             pass
         elif tokens[0] == "goto":
             #goto stuff
-            # print("g othere")
+            print("g othere")
             pass
 
 def print_data_segment(data_segments):
