@@ -7,10 +7,20 @@ class convert():
     def __init__(self):
         pass
     
+    def isInMap(self, dst):
+        try:
+            x = self.mapping[dst]
+            return 1
+        except:
+            return 0
+
     def pullFromMap(self):
         pass
 
-    def getReg(self):
+    def getReg(self, dst):
+        if(self.isInMap(dst)):
+            return self.getSrc(dst)
+
         if len(self.registers):
             return self.registers.pop()
         else:
@@ -22,6 +32,8 @@ class convert():
     def getImmediate(self, number):
         # what
         return str(number)
+
+
 
     def getSrc(self, src):
         # src = ""
@@ -40,7 +52,7 @@ class convert():
 
         tokens = line.split()
         
-        dest_reg = self.getReg()
+        dest_reg = self.getReg(tokens[0])
 
         self.addMapping(dest_reg, tokens[0])
 
@@ -50,7 +62,7 @@ class convert():
             
             src = self.getSrc(tokens[2])
 
-            return "mov " + dest_reg + ", " + src
+            return "mov " + src + ", " + dest_reg
             
             
         else:
@@ -100,6 +112,13 @@ class convert():
                             "sete %al"+ "\n" + \
                             "movzbl %al, %eax\n" + \
                             "mov %eax, " + dest_reg
+
+            elif "+" == expr[1]:
+                return "mov " + src1 + ", %edx\n" + \
+                        "mov " + src2 + ", %eax\n" + \
+                        "add %eax, %edx\n" + \
+                        "mov %eax, " + dest_reg
+
 
 
 
