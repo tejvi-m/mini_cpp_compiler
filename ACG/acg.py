@@ -128,6 +128,22 @@ def gen_arith_exprs(mappings, data_segments, expanded_rhs, lhs):
 def gen_branch_cond(tokens):
     print("B" + flag + " " + tokens[-1])
 
+def change_flags():
+    global flag
+    if(flag == "LT"):
+        flag = "GE"
+    elif(flag == "LE"):
+        flag = "GT"
+    elif(flag == "GE"):
+        flag = "LT"
+    if(flag == "GT"):
+        flag = "LE"
+    if(flag == "EQ"):
+        flag = "NE"
+
+def gen_goto(tokens):
+    print("B "+ tokens[-1])
+
 def gen_exps(mappings, data_segments, icg):
     for i in range(len(icg)):
         tokens = icg[i].strip().split()
@@ -138,18 +154,17 @@ def gen_exps(mappings, data_segments, icg):
                 gen_assign_exps(mappings, data_segments, expanded_rhs, lhs)
             elif(len(expanded_rhs) == 3):
                 gen_arith_exprs(mappings, data_segments, expanded_rhs, lhs)
+            elif("not" in expanded_rhs):
+                change_flags()
         elif len(tokens) == 2 and tokens[-1] == ":":
             # label
             print(icg[i])
         elif tokens[0] == "if" and tokens[2] == "goto":
-            print("conds", flag)
             gen_branch_cond(tokens)
             #condition stuff
-            pass
         elif tokens[0] == "goto":
             #goto stuff
-            print("g othere")
-            pass
+            gen_goto(tokens)
 
 def print_data_segment(data_segments):
     print(".DATA")
