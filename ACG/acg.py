@@ -65,7 +65,7 @@ def gen_assign_exps(mappings, data_segments, expanded_rhs, lhs):
             print("MOV " + temp_reg + ", " + mappings[expanded_rhs[0]])
         print("LDR " + mappings[lhs.strip()] + " ,=" + lhs.strip())
         print("STR " + temp_reg + " ,[" + mappings[lhs.strip()] +"]")
-        # maxNum += 1 not sure if this benifits in reducinf num of registers
+        maxNum += 1
     else:
         print("MOV " + mappings[lhs.strip()] + ", #" + expanded_rhs[0])
 def gen_arith_exprs(mappings, data_segments, expanded_rhs, lhs):
