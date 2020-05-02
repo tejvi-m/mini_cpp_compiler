@@ -68,7 +68,37 @@ def gen_assign_exps(mappings, data_segments, expanded_rhs, lhs):
         # maxNum += 1 not sure if this benifits in reducinf num of registers
     else:
         print("MOV " + mappings[lhs.strip()] + ", #" + expanded_rhs[0])
+def gen_arith_exprs(mappings, data_segments, expanded_rhs, lhs):
+    global maxNum
+    global flag
+    if(expanded_rhs[1] == "+"):
+        if(expanded_rhs[0].isnumeric()):
+            print("ADD " + mappings[lhs.strip()] + ", " + mappings[expanded_rhs[2]] + ", #" + expanded_rhs[0])
 
+        elif(expanded_rhs[2].isnumeric()):
+            print("ADD " + mappings[lhs.strip()] + ", " + mappings[expanded_rhs[0]] + ", #" + expanded_rhs[2])
+
+        else:
+            print("ADD " + mappings[lhs.strip()] + ", " + mappings[expanded_rhs[0]] + ", " + mappings[expanded_rhs[2]])
+    elif(expanded_rhs[1] == "*"):
+        if(expanded_rhs[0].isnumeric()):
+            print("MUL " + mappings[lhs.strip()] + ", " + mappings[expanded_rhs[2]] + ", #" + expanded_rhs[0])
+
+        elif(expanded_rhs[2].isnumeric()):
+            print("MUL " + mappings[lhs.strip()] + ", " + mappings[expanded_rhs[0]] + ", #" + expanded_rhs[2])
+
+        else:
+            print("MUL " + mappings[lhs.strip()] + ", " + mappings[expanded_rhs[0]] + ", " + mappings[expanded_rhs[2]])
+    elif(expanded_rhs[1] == "-"):
+        if(expanded_rhs[0].isnumeric()):
+            print("SUB " + mappings[lhs.strip()] + ", #" + expanded_rhs[0] + ", " +  mappings[expanded_rhs[2]])
+
+        elif(expanded_rhs[2].isnumeric()):
+            print("SUB " + mappings[lhs.strip()] + ", " + mappings[expanded_rhs[0]] + ", #" + expanded_rhs[2])
+
+        else:
+            print("SUB " + mappings[lhs.strip()] + ", " + mappings[expanded_rhs[0]] + ", " + mappings[expanded_rhs[2]])
+    
 def gen_exps(mappings, data_segments, icg):
     for i in range(len(icg)):
         tokens = icg[i].strip().split()
@@ -78,8 +108,7 @@ def gen_exps(mappings, data_segments, icg):
             if(len(expanded_rhs) == 1):
                 gen_assign_exps(mappings, data_segments, expanded_rhs, lhs)
             elif(len(expanded_rhs) == 3):
-                # arithmetic and other ops   
-                pass
+                gen_arith_exprs(mappings, data_segments, expanded_rhs, lhs)
         elif len(tokens) == 2 and tokens[-1] == ":":
             # label
             print(icg[i])
