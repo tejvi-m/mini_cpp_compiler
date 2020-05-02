@@ -54,6 +54,44 @@ def fill_data_seg(mappings):
             data_segments.append(keyList[i])
     return data_segments
 
+def gen_assign_exps(mappings, data_segments, expanded_rhs, lhs):
+    global maxNum
+    if(lhs.strip() in data_segments):
+        #load instructions.
+        temp_reg = "R" + str(maxNum)
+        if(expanded_rhs[0].isnumeric()):
+            print("MOV " + temp_reg + ", #" + expanded_rhs[0])
+        else:
+            print("MOV " + temp_reg + ", " + mappings[expanded_rhs[0]])
+        print("LDR " + mappings[lhs.strip()] + " ,=" + lhs.strip())
+        print("STR " + temp_reg + " ,[" + mappings[lhs.strip()] +"]")
+        # maxNum += 1 not sure if this benifits in reducinf num of registers
+    else:
+        print("MOV " + mappings[lhs.strip()] + ", #" + expanded_rhs[0])
+
+def gen_exps(mappings, data_segments, icg):
+    for i in range(len(icg)):
+        tokens = icg[i].strip().split()
+        if("=" in icg[i]):
+            lhs, rhs = icg[i].split("=")
+            expanded_rhs = rhs.strip().split()
+            if(len(expanded_rhs) == 1):
+                gen_assign_exps(mappings, data_segments, expanded_rhs, lhs)
+            elif(len(expanded_rhs) == 3):
+                # arithmetic and other ops   
+                pass
+        elif len(tokens) == 2 and tokens[-1] == ":":
+            # label
+            print(icg[i])
+        elif tokens[0] == "if" and tokens[2] == "goto":
+            # print("conds", flag)
+            #condition stuff
+            pass
+        elif tokens[0] == "goto":
+            #goto stuff
+            # print("g othere")
+            pass
+
 def print_data_segment(data_segments):
     print(".DATA")
     for i in data_segments:
@@ -66,4 +104,5 @@ if __name__ == "__main__":
     print("maps", mappings, "data", data_segments)
     print(".TEXT")
     # generate the code
+    gen_exps(mappings, data_segments, icg)
     print_data_segment(data_segments)
