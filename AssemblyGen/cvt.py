@@ -63,7 +63,22 @@ class convert():
                         "setle %al"+ "\n" + \
                         "movzbl %al, %eax\n" + \
                         "mov %eax, " + dest_reg
-            else:
-                pass
+            
+            elif ">" == expr[1]:
+                return "compl " + src1 + ", " + src2 + "\n" + \
+                            "setge %al"+ "\n" + \
+                            "movzbl %al, %eax\n" + \
+                            "mov %eax, " + dest_reg
+                
 
-               
+            elif ">=" == expr[1]:
+                return "compl " + src1 + ", " + src2 + "\n" + \
+                            "setg %al"+ "\n" + \
+                            "movzbl %al, %eax\n" + \
+                            "mov %eax, " + dest_reg
+
+            elif "<=" == expr[1]:
+                return "compl " + src1 + ", " + src2 + "\n" + \
+                            "setl %al"+ "\n" + \
+                            "movzbl %al, %eax\n" + \
+                            "mov %eax, " + dest_reg
