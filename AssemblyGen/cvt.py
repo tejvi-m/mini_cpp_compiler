@@ -54,6 +54,12 @@ class convert():
             
             
         else:
+            if len(expr) == 2 and expr[0] == "not":
+                return "compl $0x0, " + self.getSrc(expr[1]) + "\n" + \
+                        "setle %al"+ "\n" + \
+                        "movzbl %al, %eax\n" + \
+                        "mov %eax, " + dest_reg
+
             src1 = self.getSrc(expr[0])
             src2 = self.getSrc(expr[2])
 
@@ -82,3 +88,17 @@ class convert():
                             "setl %al"+ "\n" + \
                             "movzbl %al, %eax\n" + \
                             "mov %eax, " + dest_reg
+            
+            elif "==" == expr[1]:
+                return "compl " + src1 + ", " + src2 + "\n" + \
+                            "sete %al"+ "\n" + \
+                            "movzbl %al, %eax\n" + \
+                            "mov %eax, " + dest_reg
+
+            elif "!=" == expr[1]:
+                return "compl " + src1 + ", " + src2 + "\n" + \
+                            "sete %al"+ "\n" + \
+                            "movzbl %al, %eax\n" + \
+                            "mov %eax, " + dest_reg
+
+            

@@ -1,4 +1,4 @@
 L1:
 i = 1
 j = i
-x = i < j
+x = not i
