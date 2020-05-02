@@ -14,6 +14,6 @@ if __name__ == "__main__":
         elif line[-1] == ":" and len(line.split()) == 1:
             # label
             print(line)
-    
+        # elif 
         else:
             pass

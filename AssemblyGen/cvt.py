@@ -23,6 +23,19 @@ class convert():
         # what
         return str(number)
 
+    def getSrc(self, src):
+        # src = ""
+        try:
+            src = self.getImmediate(int(src))
+        except ValueError:
+            try:
+                src = self.mapping[src]
+            except KeyError:
+                print("Key error on: ", src)
+        
+        return src
+        
+
     def convert_eq(self, line):
 
         tokens = line.split()
@@ -33,18 +46,24 @@ class convert():
 
         expr = tokens[2:]
         if len(expr) == 1:
-            src = tokens[2]
-
-            try:
-                src = self.getImmediate(int(src))
-            except ValueError:
-                try:
-                    src = self.mapping[src]
-                except KeyError:
-                    pass
+            # src = tokens[2]
+            
+            src = self.getSrc(tokens[2])
 
             return "mov " + dest_reg + ", " + src
             
+            
         else:
+            src1 = self.getSrc(expr[0])
+            src2 = self.getSrc(expr[2])
 
-            pass
+            # based on disas on gdb
+            if "<" == expr[1]:
+                return "compl " + src1 + ", " + src2 + "\n" + \
+                        "setle %al"+ "\n" + \
+                        "movzbl %al, %eax\n" + \
+                        "mov %eax, " + dest_reg
+            else:
+                pass
+
+               
