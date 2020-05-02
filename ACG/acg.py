@@ -125,6 +125,9 @@ def gen_arith_exprs(mappings, data_segments, expanded_rhs, lhs):
         print("LDR " + temp_reg + " ,=" + lhs.strip())
         print("STR "+ mappings[lhs.strip()] + ",["+ temp_reg +"]")
 
+def gen_branch_cond(tokens):
+    print("B" + flag + " " + tokens[-1])
+
 def gen_exps(mappings, data_segments, icg):
     for i in range(len(icg)):
         tokens = icg[i].strip().split()
@@ -140,6 +143,7 @@ def gen_exps(mappings, data_segments, icg):
             print(icg[i])
         elif tokens[0] == "if" and tokens[2] == "goto":
             print("conds", flag)
+            gen_branch_cond(tokens)
             #condition stuff
             pass
         elif tokens[0] == "goto":
