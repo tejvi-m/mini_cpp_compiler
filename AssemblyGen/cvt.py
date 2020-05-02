@@ -31,7 +31,7 @@ class convert():
 
     def getImmediate(self, number):
         # what
-        return str(number)
+        return "$0x" + str(int(str(number), 16))
 
 
 
@@ -118,7 +118,23 @@ class convert():
                         "mov " + src2 + ", %eax\n" + \
                         "add %eax, %edx\n" + \
                         "mov %eax, " + dest_reg
+            elif "-" == expr[1]:
+                return "mov " + src1 + ", %edx\n" + \
+                        "mov " + src2 + ", %eax\n" + \
+                        "add %eax, %edx\n" + \
+                        "mov %eax, " + dest_reg
 
+            elif "*" == expr[1]:
+                    return "mov " + src1 + ", %edx\n" + \
+                            "mov " + src2 + ", %eax\n" + \
+                            "imul /*THIS IS WRONG*/ %eax, %edx\n" + \
+                            "mov %eax, " + dest_reg
+
+            elif "/" == expr[1]:
+                return "mov " + src1 + ", %edx\n" + \
+                        "idivl /*THIS IS WRONG*/ " + src2 + ", %eax\n" + \
+                        "add %eax, %edx\n" + \
+                        "mov %eax, " + dest_reg
 
 
 
