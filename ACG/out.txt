@@ -1,0 +1,33 @@
+.TEXT
+MOV R9, #9
+LDR R6 ,=j
+STR R9 ,[R6]
+MOV R10, #0
+LDR R5 ,=i
+STR R10 ,[R5]
+L1 :
+CMP R5, #4
+BGE L4
+B L2
+L3 :
+ADD R4, R5, #1
+MOV R11, R4
+LDR R5 ,=i
+STR R11 ,[R5]
+B L1
+L2 :
+ADD R6, R6, #1
+LDR R12 ,=j
+STR R6,[R12]
+B L3
+L4 :
+MOV R12, #2
+LDR R8 ,=x
+STR R12 ,[R8]
+MOV R13, #2
+LDR R8 ,=x
+STR R13 ,[R8]
+.DATA
+j: .WORD
+i: .WORD
+x: .WORD
