@@ -1,4 +1,17 @@
-L1:
-i = 1
-j = i
-x = not i
+j = 9
+i = 0
+L1 : 
+t00 = i < 4
+t01 = not t00
+if t01 goto L4
+goto L2
+L3 :
+ t02 = i + 1
+i = t02
+goto L1
+L2 :
+j = j + 1
+goto L3 
+L4 : 
+x = 2
+x = 2

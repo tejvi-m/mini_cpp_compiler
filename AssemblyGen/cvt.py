@@ -101,4 +101,17 @@ class convert():
                             "movzbl %al, %eax\n" + \
                             "mov %eax, " + dest_reg
 
-            
+
+
+    def getAddr(self, label):
+        return label
+
+    def convert_if_branch(self, line):
+        tokens = line.split()
+        return "cmpl $0x0, " + self.getSrc(tokens[1]) + "\n" + \
+                "jne " + self.getAddr(tokens[3])
+
+ 
+    def cvt_goto(self, line):
+        tokens = line.strip().split()
+        return "jmp " + self.getAddr(tokens[1])
