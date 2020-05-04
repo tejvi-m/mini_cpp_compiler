@@ -10,8 +10,22 @@ class convert():
     def __init__(self, filename):
         self.filename = filename
 
-    def genAssembly(self, outputFileName):
+
+    def addLabelMapping(self, labels, line):
+        addr = line.split()[0]
+        print(self.labelMapping)
+
+        for label in labels:
+            self.labelMapping.update({label:addr})
         
+
+    def getAddr(self, label):
+        # print(self.labelMapping)
+        print("returning ", self.labelMapping[label])
+        return self.labelMapping[label]
+
+    def genAssembly(self, outputFileName):
+
         data = open(self.filename).readlines()
         outFile = open(outputFileName, 'w')
         intermediateFile = open("." + self.filename + "_intermediate.txt", 'w')
@@ -31,6 +45,39 @@ class convert():
 
             elif tokens[0] == "goto":
                 [intermediateFile.write(x + '\n') for x in self.cvt_goto(line).split("\n")]
+
+        intermediateFile.close()
+
+        intermediateFile = open("." + self.filename + "_intermediate.txt", "r")
+
+        labels =  set()   
+        for line in intermediateFile.readlines():
+            line = line.strip()
+            tokens = line.split()
+
+            if tokens[-1] == ":" and len(tokens) == 2:
+                labels.add(line.split()[0])
+            elif len(labels) > 0:
+                print("wow")
+                self.addLabelMapping(labels, line)
+                labels = set()
+
+        intermediateFile.close()
+
+        intermediateFile = open("." + self.filename + "_intermediate.txt", "r")
+
+        for line in intermediateFile.readlines():
+            line = line.strip()
+            tokens = line.split()
+            print(tokens)
+            if tokens[1] == "jmp" or tokens[1] == "jne":
+                print("found label", self.labelMapping[tokens[2]])
+                outFile.write(tokens[0] + "   " + tokens[1] + " " + self.labelMapping[tokens[2]] + '\n')
+            
+            elif tokens[-1] != ":":
+                outFile.write(line + '\n')
+        
+        outFile.close()
 
     def isInMap(self, dst):
         try:
