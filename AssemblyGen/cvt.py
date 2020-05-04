@@ -3,12 +3,35 @@ class convert():
     mapping = dict()
     labelMapping = dict()
     pc = 0
+    filename = ""
 
     arithmeticOps = {"+", "-", "/", "*"}
 
-    def __init__(self):
-        pass
-    
+    def __init__(self, filename):
+        self.filename = filename
+
+    def genAssembly(self, outputFileName):
+        
+        data = open(self.filename).readlines()
+        outFile = open(outputFileName, 'w')
+        intermediateFile = open("." + self.filename + "_intermediate.txt", 'w')
+
+        for line in data:
+            line = line.strip()
+            tokens = line.split()
+
+            if "=" in line:
+                [intermediateFile.write(x + '\n') for x in self.convert_eq(line).split("\n")]
+
+            elif len(tokens) == 2 and tokens[-1] == ":":
+                intermediateFile.write(line + '\n')         
+
+            elif tokens[0] == "if" and tokens[2] == "goto":
+                [intermediateFile.write(x + '\n') for x in self.convert_if_branch(line).split("\n")]
+
+            elif tokens[0] == "goto":
+                [intermediateFile.write(x + '\n') for x in self.cvt_goto(line).split("\n")]
+
     def isInMap(self, dst):
         try:
             x = self.mapping[dst]
