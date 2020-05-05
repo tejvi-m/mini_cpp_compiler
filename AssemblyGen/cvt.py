@@ -1,7 +1,13 @@
+import random
+
+
 class convert():
-    registers = {"%rax", "%rbx", "%rcx", "%rdx", "%rdi", "%rsi", "%rbp", "%rsp", "%r8", "%r9", "%r10", "%r11", "%r12", "%r13", "%r14", "%r15"}
+    # registers = {"%rax", "%rbx", "%rcx", "%rdx", "%rdi", "%rsi", "%rbp", "%rsp", "%r8", "%r9", "%r10", "%r11", "%r12", "%r13", "%r14", "%r15"}
+    registers = {"%r14", "%r15"}
+
     mapping = dict()
     labelMapping = dict()
+    addressMapping = dict()
     pc = 0
     filename = ""
 
@@ -78,12 +84,17 @@ class convert():
 
     def genAdd(self):
         x = self.pc
-        self.pc += 1
+        self.pc += 4
         return "<" + "{:010d}".format(x) + ">   "
         
 
     def pullFromMap(self):
-        pass
+        variable = random.choice(list(self.mapping))
+        self.addressMapping[variable] = "%xxx"
+        reg = self.mapping[variable]
+        print("removing:", variable, reg)
+        del self.mapping[variable]
+        return reg
 
     def getReg(self, dst):
         if(self.isInMap(dst)):
@@ -95,6 +106,7 @@ class convert():
             return self.pullFromMap()
     
     def addMapping(self, register, variable):
+        print("adding:", register, variable)
         self.mapping.update({variable : register})
 
     def getImmediate(self, number):
@@ -111,7 +123,10 @@ class convert():
             try:
                 src = self.mapping[src]
             except KeyError:
-                print("Key error on: ", src)
+                srcReg = self.pullFromMap()
+                self.mapping[src] = srcReg
+                src = srcReg
+                # print("Key error on: ", src)
         
         return src
         
