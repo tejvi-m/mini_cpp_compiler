@@ -1,0 +1,6 @@
+[ ] Registers
+[ ] Loads
+[ ] Branches
+[ ] Arithmetic ops
+[ ] temps 
+[ ] FIGURE OUT ISA - x86, 64 bit registers
