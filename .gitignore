@@ -5,3 +5,4 @@
 *.yy.*
 *.tab.*
 .vscode
+*__pycache__/*
