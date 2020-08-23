@@ -1,9 +1,5 @@
-# Mini Compiler
+# Mini Compiler for C++
 
-A compiler to work on a subset of C++
+A compiler to work on a subset of the C++ language.
 
-The test file is test.cpp
-```
-cd Phase-1
-bash start.sh
-```
+Each subfolder contains a readme with the instructions to run the scripts.
